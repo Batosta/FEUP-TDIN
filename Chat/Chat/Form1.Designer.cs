@@ -1,6 +1,6 @@
 ﻿namespace Chat
 {
-    partial class Form1
+    partial class Login
     {
         /// <summary>
         /// Required designer variable.
@@ -29,51 +29,52 @@
         private void InitializeComponent()
         {
             this.register_button = new System.Windows.Forms.Button();
-            this.nickname_box = new System.Windows.Forms.TextBox();
+            this.username_box = new System.Windows.Forms.TextBox();
             this.password_box = new System.Windows.Forms.TextBox();
-            this.nickname_label = new System.Windows.Forms.Label();
+            this.username_label = new System.Windows.Forms.Label();
             this.password_label = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
+            this.login_button = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // register_button
             // 
-            this.register_button.Location = new System.Drawing.Point(152, 232);
+            this.register_button.Location = new System.Drawing.Point(156, 267);
             this.register_button.Name = "register_button";
             this.register_button.Size = new System.Drawing.Size(75, 23);
-            this.register_button.TabIndex = 0;
+            this.register_button.TabIndex = 6;
             this.register_button.Text = "Register";
             this.register_button.UseVisualStyleBackColor = true;
             this.register_button.Click += new System.EventHandler(this.button1_Click);
             // 
-            // nickname_box
+            // username_box
             // 
-            this.nickname_box.Location = new System.Drawing.Point(121, 70);
-            this.nickname_box.Name = "nickname_box";
-            this.nickname_box.Size = new System.Drawing.Size(187, 20);
-            this.nickname_box.TabIndex = 1;
+            this.username_box.Location = new System.Drawing.Point(111, 72);
+            this.username_box.Name = "username_box";
+            this.username_box.Size = new System.Drawing.Size(187, 20);
+            this.username_box.TabIndex = 1;
             // 
             // password_box
             // 
-            this.password_box.Location = new System.Drawing.Point(121, 142);
+            this.password_box.Location = new System.Drawing.Point(111, 124);
             this.password_box.Name = "password_box";
             this.password_box.Size = new System.Drawing.Size(187, 20);
             this.password_box.TabIndex = 2;
             // 
-            // nickname_label
+            // username_label
             // 
-            this.nickname_label.AutoSize = true;
-            this.nickname_label.Location = new System.Drawing.Point(60, 73);
-            this.nickname_label.Name = "nickname_label";
-            this.nickname_label.Size = new System.Drawing.Size(55, 13);
-            this.nickname_label.TabIndex = 3;
-            this.nickname_label.Text = "Nickname";
-            this.nickname_label.Click += new System.EventHandler(this.label1_Click);
+            this.username_label.AutoSize = true;
+            this.username_label.Location = new System.Drawing.Point(50, 75);
+            this.username_label.Name = "username_label";
+            this.username_label.Size = new System.Drawing.Size(55, 13);
+            this.username_label.TabIndex = 3;
+            this.username_label.Text = "Username";
+            this.username_label.Click += new System.EventHandler(this.label1_Click);
             // 
             // password_label
             // 
             this.password_label.AutoSize = true;
-            this.password_label.Location = new System.Drawing.Point(60, 145);
+            this.password_label.Location = new System.Drawing.Point(52, 127);
             this.password_label.Name = "password_label";
             this.password_label.Size = new System.Drawing.Size(53, 13);
             this.password_label.TabIndex = 4;
@@ -83,25 +84,35 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(132, 205);
+            this.label1.Location = new System.Drawing.Point(134, 240);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(122, 13);
-            this.label1.TabIndex = 5;
+            this.label1.TabIndex = 6;
             this.label1.Text = "Don\'t have an account?";
             // 
-            // Form1
+            // login_button
+            // 
+            this.login_button.Location = new System.Drawing.Point(156, 160);
+            this.login_button.Name = "login_button";
+            this.login_button.Size = new System.Drawing.Size(75, 23);
+            this.login_button.TabIndex = 5;
+            this.login_button.Text = "Login";
+            this.login_button.UseVisualStyleBackColor = true;
+            // 
+            // Login
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(376, 305);
+            this.ClientSize = new System.Drawing.Size(384, 311);
+            this.Controls.Add(this.login_button);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.password_label);
-            this.Controls.Add(this.nickname_label);
+            this.Controls.Add(this.username_label);
             this.Controls.Add(this.password_box);
-            this.Controls.Add(this.nickname_box);
+            this.Controls.Add(this.username_box);
             this.Controls.Add(this.register_button);
-            this.Name = "Form1";
-            this.Text = "Form1";
+            this.Name = "Login";
+            this.Text = "Login";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -111,11 +122,12 @@
         #endregion
 
         private System.Windows.Forms.Button register_button;
-        private System.Windows.Forms.TextBox nickname_box;
+        private System.Windows.Forms.TextBox username_box;
         private System.Windows.Forms.TextBox password_box;
-        private System.Windows.Forms.Label nickname_label;
+        private System.Windows.Forms.Label username_label;
         private System.Windows.Forms.Label password_label;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Button login_button;
     }
 }
 

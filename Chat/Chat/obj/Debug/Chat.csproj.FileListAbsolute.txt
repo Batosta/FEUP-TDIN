@@ -2,8 +2,9 @@ C:\Users\S530UF-78AM3CB2\Desktop\TDIN\FEUP-TDIN\Chat\Chat\bin\Debug\Chat.exe.con
 C:\Users\S530UF-78AM3CB2\Desktop\TDIN\FEUP-TDIN\Chat\Chat\bin\Debug\Chat.exe
 C:\Users\S530UF-78AM3CB2\Desktop\TDIN\FEUP-TDIN\Chat\Chat\bin\Debug\Chat.pdb
 C:\Users\S530UF-78AM3CB2\Desktop\TDIN\FEUP-TDIN\Chat\Chat\obj\Debug\Chat.csprojAssemblyReference.cache
-C:\Users\S530UF-78AM3CB2\Desktop\TDIN\FEUP-TDIN\Chat\Chat\obj\Debug\Chat.Form1.resources
 C:\Users\S530UF-78AM3CB2\Desktop\TDIN\FEUP-TDIN\Chat\Chat\obj\Debug\Chat.Properties.Resources.resources
 C:\Users\S530UF-78AM3CB2\Desktop\TDIN\FEUP-TDIN\Chat\Chat\obj\Debug\Chat.csproj.GenerateResource.cache
 C:\Users\S530UF-78AM3CB2\Desktop\TDIN\FEUP-TDIN\Chat\Chat\obj\Debug\Chat.exe
 C:\Users\S530UF-78AM3CB2\Desktop\TDIN\FEUP-TDIN\Chat\Chat\obj\Debug\Chat.pdb
+C:\Users\S530UF-78AM3CB2\Desktop\TDIN\FEUP-TDIN\Chat\Chat\obj\Debug\Chat.Login.resources
+C:\Users\S530UF-78AM3CB2\Desktop\TDIN\FEUP-TDIN\Chat\Chat\obj\Debug\Chat.Register.resources
