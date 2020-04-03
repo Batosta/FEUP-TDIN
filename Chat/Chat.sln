@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chat", "Chat\Chat.csproj", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatServer", "ChatServer\ChatServer.csproj", "{EEB08EE9-65D8-42E0-BA20-D69013F5D809}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Classes", "Classes\Classes.csproj", "{C48E6BDE-6990-41C6-9F92-9B8694E823AA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Classes", "Classes\Classes.csproj", "{5E3E90A4-6B40-44AA-B79E-7F80CB8A2BD7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +23,10 @@ Global
 		{EEB08EE9-65D8-42E0-BA20-D69013F5D809}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EEB08EE9-65D8-42E0-BA20-D69013F5D809}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EEB08EE9-65D8-42E0-BA20-D69013F5D809}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C48E6BDE-6990-41C6-9F92-9B8694E823AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C48E6BDE-6990-41C6-9F92-9B8694E823AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C48E6BDE-6990-41C6-9F92-9B8694E823AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C48E6BDE-6990-41C6-9F92-9B8694E823AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E3E90A4-6B40-44AA-B79E-7F80CB8A2BD7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E3E90A4-6B40-44AA-B79E-7F80CB8A2BD7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E3E90A4-6B40-44AA-B79E-7F80CB8A2BD7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E3E90A4-6B40-44AA-B79E-7F80CB8A2BD7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

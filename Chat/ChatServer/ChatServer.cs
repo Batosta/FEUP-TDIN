@@ -19,14 +19,6 @@ namespace ChatServer
             MongoClient databaseClient = new MongoClient("mongodb://localhost:27017");
             IMongoDatabase database = databaseClient.GetDatabase("nome_db");        // Alterar esta merdita
 
-            var dbList = databaseClient.ListDatabases().ToList();
-
-            Console.WriteLine("The list of databases on this server is: ");
-            foreach (var db in dbList)
-            {
-                Console.WriteLine(db);
-            }
-            
             //  Register server
             Console.WriteLine("Registering server.. ");
             RemotingConfiguration.Configure("ChatServer.exe.config", false);
