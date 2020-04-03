@@ -12,13 +12,6 @@ namespace ChatServer
     {
         static void Main(string[] args)
         {
-            
-            //  Start database
-            Console.WriteLine("Creating database.. ");
-
-            MongoClient databaseClient = new MongoClient("mongodb://localhost:27017");
-            IMongoDatabase database = databaseClient.GetDatabase("nome_db");        // Alterar esta merdita
-
             //  Register server
             Console.WriteLine("Registering server.. ");
             RemotingConfiguration.Configure("ChatServer.exe.config", false);
@@ -30,10 +23,17 @@ namespace ChatServer
 
     public class ServerObj : MarshalByRefObject, IServerObj
     {
+        MongoClient databaseClient;
+        IMongoDatabase database;
 
-        public void Register(string username, string password, string fullname)
+        public void Register(string username, string realName, string password)
         {
-            Console.WriteLine("Registered: " + username + ' ' + password + ' ' + fullname);
+            databaseClient = new MongoClient("mongodb://localhost:27017");
+            database = databaseClient.GetDatabase("serverDB");
+
+            var collection = database.GetCollection<UserModel>("User");
+            collection.InsertOne(new UserModel { Username = username, RealName = realName, Password = password });
+            Console.WriteLine("User Registered");
         }
 
     }

@@ -25,7 +25,7 @@ namespace Chat
             IServerObj obj = (IServerObj) Activator.GetObject(typeof(IServerObj),
                   "tcp://localhost:9000/ChatServer/Rem");
 
-            obj.Register("migumigu", "passworddemerda", "Miguel Dias de Carvalho");
+            obj.Register("username", "realname", "password");
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
