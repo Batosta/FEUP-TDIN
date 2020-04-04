@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MongoDB.Driver;  // To use the MongoDB.Driver we need to add a directive
 using System.Runtime.Remoting;
 

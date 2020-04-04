@@ -1,19 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Chat
 {
     public partial class Register : Form
     {
-        public Register()
+
+        IServerObj iServerObj;
+
+        public Register(IServerObj iServerObj)
         {
+            this.iServerObj = iServerObj;
             InitializeComponent();
         }
 
@@ -34,7 +31,13 @@ namespace Chat
 
         private void register_button_Click(object sender, EventArgs e)
         {
+            // Register the user in the database
+            iServerObj.Register(username_box.Text, name_box.Text, password_box.Text);
 
+            // Open the login window once again
+            Login newLogin = new Login(iServerObj);
+            newLogin.Show();
+            this.Hide();
         }
     }
 }

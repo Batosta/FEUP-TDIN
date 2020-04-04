@@ -5,8 +5,11 @@ namespace Chat
 {
     public partial class Login : Form
     {
-        public Login()
+        IServerObj iServerObj;
+
+        public Login(IServerObj iServerObj)
         {
+            this.iServerObj = iServerObj;
             InitializeComponent();
         }
 
@@ -18,7 +21,7 @@ namespace Chat
         private void button1_Click(object sender, EventArgs e)
         {
             // Open the register window
-            Register newRegister = new Register();
+            Register newRegister = new Register(iServerObj);
             newRegister.Show();
             this.Hide();
         }
