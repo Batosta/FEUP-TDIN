@@ -25,17 +25,51 @@ namespace ChatServer
 
     public class ServerObj : MarshalByRefObject, IServerObj
     {
-        MongoClient databaseClient;
-        IMongoDatabase database;
+        readonly MongoClient databaseClient;
+        readonly IMongoDatabase database;
 
-        public void Register(string username, string realName, string password)
+        public ServerObj()
         {
             databaseClient = new MongoClient("mongodb://localhost:27017");
             database = databaseClient.GetDatabase("serverDB");
+            Console.WriteLine("Connected to the database");
+        }
+
+        public void Register(string username, string realName, string password)
+        {
+            var collection = database.GetCollection<UserModel>("User");
+            UserModel newUser = new UserModel
+            {
+                Username = username,
+                RealName = realName,
+                Password = password
+            };
+            collection.InsertOne(newUser);
+            Console.WriteLine("User Registered");
+        }
+
+        /*
+         * Return Values:
+         * 1 - Correct username and password
+         * 2 - Correct Username, but wrong password
+         * 3 - Wrong username and password
+         */
+        public int Login(string username, string password)
+        {
 
             var collection = database.GetCollection<UserModel>("User");
-            collection.InsertOne(new UserModel { Username = username, RealName = realName, Password = password });
-            Console.WriteLine("User Registered");
+            var filter = Builders<UserModel>.Filter.Eq("Username", username);
+            var user = collection.Find(filter).FirstOrDefault();
+
+            if(user != null)
+            {
+                if (PasswordHandler.Validate(password, user.Password))
+                    return 1;
+                else
+                    return 2;
+            }
+            else
+                return 3;
         }
 
         public string HashPassword(string password)

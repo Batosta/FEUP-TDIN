@@ -5,7 +5,7 @@ namespace Chat
 {
     public partial class Login : Form
     {
-        IServerObj iServerObj;
+        readonly IServerObj iServerObj;
 
         public Login(IServerObj iServerObj)
         {
@@ -34,6 +34,28 @@ namespace Chat
         private void label1_Click_1(object sender, EventArgs e)
         {
 
+        }
+
+        private void login_button_Click(object sender, EventArgs e)
+        {
+            int loginResult = iServerObj.Login(username_box.Text, password_box.Text);
+            switch (loginResult)
+            {
+                case 1:
+                    MessageBox.Show("Correct username and password.");
+                    break;
+
+                case 2:
+                    MessageBox.Show("The password for that username is not correct.");
+                    break;
+
+                case 3:
+                    MessageBox.Show("There is no user with that username.");
+                    break;
+
+                default:
+                    break;
+            }
         }
     }
 }

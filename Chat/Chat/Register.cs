@@ -5,7 +5,7 @@ namespace Chat
 {
     public partial class Register : Form
     {
-        IServerObj iServerObj;
+        readonly IServerObj iServerObj;
 
         public Register(IServerObj iServerObj)
         {
