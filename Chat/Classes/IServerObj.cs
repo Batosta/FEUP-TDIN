@@ -4,7 +4,8 @@ using System.Text;
 
 public interface IServerObj
 {
+    void Register(string username, string realName, string password);
 
-    void Register(string username, string password, string fullname);
+    string HashPassword(string password);
 }
 
