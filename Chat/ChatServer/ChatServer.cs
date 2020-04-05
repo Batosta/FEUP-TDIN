@@ -6,6 +6,7 @@ using System;
 using System.Runtime.Remoting;
 using System.Security.Cryptography;
 using System.Text;
+using MongoDB.Bson;
 using MongoDB.Driver;  // To use the MongoDB.Driver we need to add a directive
 
 namespace ChatServer
@@ -35,11 +36,16 @@ namespace ChatServer
             Console.WriteLine("Connected to the database");
         }
 
-        public void Register(string username, string realName, string password)
+        public int Register(string username, string realName, string password)
         {
 
-            Console.WriteLine("Received Register. username: " + username + " realname: " + realName + " passoword: " + password);
+            Console.WriteLine("Received Register. username: " + username + " realname: " + realName);
             var collection = database.GetCollection<UserModel>("User");
+
+            //  Check if username already exists
+            var result = collection.Find(x => x.Username == username).FirstOrDefault();
+            if (result != null) return -1;
+
             UserModel newUser = new UserModel
             {
                 Username = username,
@@ -48,6 +54,7 @@ namespace ChatServer
             };
             collection.InsertOne(newUser);
             Console.WriteLine("User Registered");
+            return 1;
         }
 
         /*

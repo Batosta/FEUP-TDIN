@@ -36,7 +36,13 @@ namespace Chat
                 MessageBox.Show("Please fill all the boxes.");
                 return;
             }
-            iServerObj.Register(username_box.Text, name_box.Text, iServerObj.HashPassword(password_box.Text));
+
+            int registerResult = iServerObj.Register(username_box.Text, name_box.Text, iServerObj.HashPassword(password_box.Text));
+            if (registerResult == -1)
+            {
+                MessageBox.Show("Username already exists.");
+                return;
+            }
 
             // Open the login window once again
             Login newLogin = new Login(iServerObj);
