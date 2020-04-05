@@ -38,6 +38,12 @@ namespace Chat
 
         private void login_button_Click(object sender, EventArgs e)
         {
+
+            if (String.IsNullOrWhiteSpace(username_box.Text) || String.IsNullOrWhiteSpace(password_box.Text))
+            {
+                MessageBox.Show("Please fill all the boxes.");
+                return;
+            }
             int loginResult = iServerObj.Login(username_box.Text, password_box.Text);
             switch (loginResult)
             {
@@ -56,6 +62,7 @@ namespace Chat
                 default:
                     break;
             }
+            
         }
     }
 }

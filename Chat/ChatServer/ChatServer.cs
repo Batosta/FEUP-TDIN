@@ -37,6 +37,8 @@ namespace ChatServer
 
         public void Register(string username, string realName, string password)
         {
+
+            Console.WriteLine("Received Register. username: " + username + " realname: " + realName + " passoword: " + password);
             var collection = database.GetCollection<UserModel>("User");
             UserModel newUser = new UserModel
             {

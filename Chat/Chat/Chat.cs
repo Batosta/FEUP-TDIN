@@ -15,7 +15,7 @@ namespace Chat
             Console.WriteLine("Connecting to server...");
             IServerObj iServerObj = (IServerObj) Activator.GetObject(typeof(IServerObj),
                   "tcp://localhost:9000/ChatServer/Rem");
-            Console.WriteLine("Connected to server...");
+            Console.WriteLine("Connected to server");
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
