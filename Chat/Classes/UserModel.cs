@@ -1,6 +1,8 @@
-﻿public class UserModel
+﻿using MongoDB.Bson;
+
+public class UserModel
 {
-    public object Id { get; set; }
+    public ObjectId Id { get; set; }
 
     public string Username { get; set; }
 
