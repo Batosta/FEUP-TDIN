@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Dummy": {
+      "commandName": "Executable",
+      "executablePath": "C:\\Users\\migu_\\Desktop\\FEUP\\4ano\\TDIN\\FEUP-TDIN\\Chat\\Chat\\bin\\Debug\\Chat.exe"
+    }
+  }
+}
