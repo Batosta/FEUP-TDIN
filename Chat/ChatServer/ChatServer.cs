@@ -3,6 +3,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Runtime.Remoting;
 using System.Security.Cryptography;
 using System.Text;
@@ -28,6 +29,8 @@ namespace ChatServer
     {
         readonly MongoClient databaseClient;
         readonly IMongoDatabase database;
+        string[] activeUsers;    //  Probably more than strings
+        List<UserSession> sessions = new List<UserSession>();
 
         public ServerObj()
         {
@@ -38,7 +41,6 @@ namespace ChatServer
 
         public int Register(string username, string realName, string password)
         {
-
             Console.WriteLine("Received Register. username: " + username + " realname: " + realName);
             var collection = database.GetCollection<UserModel>("User");
 
@@ -63,14 +65,22 @@ namespace ChatServer
          * 2 - Correct Username, but wrong password
          * 3 - Wrong username and password
          */
-        public int Login(string username, string password)
+        public int Login(string username, string password, string host, string port)
         {
+
+            Console.WriteLine("Login from: " + host + '/' + port + ", " + username + ", " + password);
+            sessions.Add(new UserSession(username, host, port));
+
+            foreach (UserSession session in sessions)
+            {
+                Console.WriteLine("session: " + session.username + " host: " + session.host);
+            }
 
             var collection = database.GetCollection<UserModel>("User");
             var filter = Builders<UserModel>.Filter.Eq("Username", username);
             var user = collection.Find(filter).FirstOrDefault();
 
-            if(user != null)
+            if (user != null)
             {
                 if (PasswordHandler.Validate(password, user.Password))
                     return 1;
@@ -84,6 +94,12 @@ namespace ChatServer
         public string HashPassword(string password)
         {
             return PasswordHandler.CreatePasswordHash(password);
+        }
+
+        public List<UserSession> GetActiveUsersList()
+        {
+            Console.WriteLine("GetActiveUsers called.");
+            return sessions;
         }
     }
 

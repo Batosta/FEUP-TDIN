@@ -5,11 +5,11 @@ namespace Chat
 {
     public partial class Login : Form
     {
-        readonly IServerObj iServerObj;
+        readonly IServerObj serverObj;
 
-        public Login(IServerObj iServerObj)
+        public Login(IServerObj serverObj)
         {
-            this.iServerObj = iServerObj;
+            this.serverObj = serverObj;
             InitializeComponent();
         }
 
@@ -21,7 +21,7 @@ namespace Chat
         private void button1_Click(object sender, EventArgs e)
         {
             // Open the register window
-            Register newRegister = new Register(iServerObj);
+            Register newRegister = new Register(serverObj);
             newRegister.Show();
             this.Hide();
         }
@@ -37,32 +37,40 @@ namespace Chat
         }
 
         private void login_button_Click(object sender, EventArgs e)
-        {
+        {   
+            //  TODO User will have to send its address and port
 
             if (String.IsNullOrWhiteSpace(username_box.Text) || String.IsNullOrWhiteSpace(password_box.Text))
             {
                 MessageBox.Show("Please fill all the boxes.");
                 return;
             }
-            int loginResult = iServerObj.Login(username_box.Text, password_box.Text);
+            int loginResult = serverObj.Login(username_box.Text, password_box.Text, Chat.host, Chat.port);
             switch (loginResult)
             {
                 case 1:
-                    MessageBox.Show("Correct username and password.");
+                    //MessageBox.Show("Correct username and password.");
                     break;
 
                 case 2:
                     MessageBox.Show("The password for that username is not correct.");
-                    break;
+                    return;
 
                 case 3:
                     MessageBox.Show("There is no user with that username.");
-                    break;
+                    return;
 
                 default:
                     break;
             }
-            
+
+            Chat.username = username_box.Text;
+
+            // Open the MainWindow
+            MainWindow newMainwindow = new MainWindow(serverObj);
+            newMainwindow.Show();
+            this.Hide();
+
         }
     }
 }

@@ -5,11 +5,11 @@ namespace Chat
 {
     public partial class Register : Form
     {
-        readonly IServerObj iServerObj;
+        readonly IServerObj serverObj;
 
-        public Register(IServerObj iServerObj)
+        public Register(IServerObj serverObj)
         {
-            this.iServerObj = iServerObj;
+            this.serverObj = serverObj;
             InitializeComponent();
         }
 
@@ -37,7 +37,7 @@ namespace Chat
                 return;
             }
 
-            int registerResult = iServerObj.Register(username_box.Text, name_box.Text, iServerObj.HashPassword(password_box.Text));
+            int registerResult = serverObj.Register(username_box.Text, name_box.Text, serverObj.HashPassword(password_box.Text));
             if (registerResult == -1)
             {
                 MessageBox.Show("Username already exists.");
@@ -45,9 +45,14 @@ namespace Chat
             }
 
             // Open the login window once again
-            Login newLogin = new Login(iServerObj);
+            Login newLogin = new Login(serverObj);
             newLogin.Show();
             this.Hide();
+        }
+
+        private void Register_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }
