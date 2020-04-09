@@ -1,4 +1,4 @@
-﻿namespace Chat
+﻿namespace ChatClient
 {
     partial class MainWindow
     {
@@ -28,18 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.listBox1 = new System.Windows.Forms.ListBox();
             this.label1 = new System.Windows.Forms.Label();
+            this.onlineSessions = new System.Windows.Forms.ListView();
             this.SuspendLayout();
-            // 
-            // listBox1
-            // 
-            this.listBox1.FormattingEnabled = true;
-            this.listBox1.Location = new System.Drawing.Point(314, 37);
-            this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(125, 173);
-            this.listBox1.TabIndex = 0;
-            this.listBox1.SelectedIndexChanged += new System.EventHandler(this.listBox1_SelectedIndexChanged);
             // 
             // label1
             // 
@@ -50,11 +41,21 @@
             this.label1.TabIndex = 1;
             this.label1.Text = "Active Users";
             // 
+            // onlineSessions
+            // 
+            this.onlineSessions.Activation = System.Windows.Forms.ItemActivation.OneClick;
+            this.onlineSessions.HideSelection = false;
+            this.onlineSessions.Location = new System.Drawing.Point(314, 37);
+            this.onlineSessions.Name = "onlineSessions";
+            this.onlineSessions.Size = new System.Drawing.Size(121, 192);
+            this.onlineSessions.TabIndex = 2;
+            this.onlineSessions.UseCompatibleStateImageBehavior = false;
+            // 
             // MainWindow
             // 
             this.ClientSize = new System.Drawing.Size(470, 390);
+            this.Controls.Add(this.onlineSessions);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.listBox1);
             this.Name = "MainWindow";
             this.Load += new System.EventHandler(this.MainWindow_Load);
             this.ResumeLayout(false);
@@ -63,8 +64,7 @@
         }
 
         #endregion
-
-        private System.Windows.Forms.ListBox listBox1;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.ListView onlineSessions;
     }
 }

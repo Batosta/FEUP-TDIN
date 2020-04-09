@@ -1,15 +1,18 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace Chat
+namespace ChatClient
 {
     public partial class Login : Form
     {
-        readonly IServerObj serverObj;
+        readonly IServerObj server;
+        readonly string port;
 
-        public Login(IServerObj serverObj)
+        public Login(IServerObj server, string port)
         {
-            this.serverObj = serverObj;
+            this.server = server;
+            this.port = port;
+
             InitializeComponent();
         }
 
@@ -21,7 +24,7 @@ namespace Chat
         private void button1_Click(object sender, EventArgs e)
         {
             // Open the register window
-            Register newRegister = new Register(serverObj);
+            Register newRegister = new Register(server, port);
             newRegister.Show();
             this.Hide();
         }
@@ -40,37 +43,34 @@ namespace Chat
         {   
             //  TODO User will have to send its address and port
 
+            // Make sure the user has filled every field
             if (String.IsNullOrWhiteSpace(username_box.Text) || String.IsNullOrWhiteSpace(password_box.Text))
             {
                 MessageBox.Show("Please fill all the boxes.");
                 return;
             }
-            int loginResult = serverObj.Login(username_box.Text, password_box.Text, Chat.host, Chat.port);
-            switch (loginResult)
+
+
+            int loginResult = server.Login(username_box.Text, password_box.Text, port);
+            if (loginResult == 1)
             {
-                case 1:
-                    //MessageBox.Show("Correct username and password.");
-                    break;
-
-                case 2:
-                    MessageBox.Show("The password for that username is not correct.");
-                    return;
-
-                case 3:
-                    MessageBox.Show("There is no user with that username.");
-                    return;
-
-                default:
-                    break;
+                server.PerformLogin(username_box.Text, port);
+                this.Hide();
+                MainWindow newMainwindow = new MainWindow(server, username_box.Text, port);
+                newMainwindow.Show();
             }
-
-            Chat.username = username_box.Text;
-
-            // Open the MainWindow
-            MainWindow newMainwindow = new MainWindow(serverObj);
-            newMainwindow.Show();
-            this.Hide();
-
+            else if (loginResult == 2)
+            {
+                MessageBox.Show("You are already logged in");
+            }
+            else if (loginResult == 3)
+            {
+                MessageBox.Show("The password for that username is not correct.");
+            }
+            else
+            {
+                MessageBox.Show("There is no user with that username.");
+            }
         }
     }
 }

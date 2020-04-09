@@ -1,15 +1,18 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace Chat
+namespace ChatClient
 {
     public partial class Register : Form
     {
-        readonly IServerObj serverObj;
+        readonly IServerObj server;
+        readonly string port;
 
-        public Register(IServerObj serverObj)
+        public Register(IServerObj server, string port)
         {
-            this.serverObj = serverObj;
+            this.server = server;
+            this.port = port;
+
             InitializeComponent();
         }
 
@@ -30,14 +33,15 @@ namespace Chat
 
         private void register_button_Click(object sender, EventArgs e)
         {
-            // Register the user in the database
+            // Make sure the user has filled every field
             if (String.IsNullOrWhiteSpace(username_box.Text) || String.IsNullOrWhiteSpace(name_box.Text) || String.IsNullOrWhiteSpace(password_box.Text))
             {
                 MessageBox.Show("Please fill all the boxes.");
                 return;
             }
 
-            int registerResult = serverObj.Register(username_box.Text, name_box.Text, serverObj.HashPassword(password_box.Text));
+            // Register the user in the database
+            int registerResult = server.Register(username_box.Text, name_box.Text, server.HashPassword(password_box.Text));
             if (registerResult == -1)
             {
                 MessageBox.Show("Username already exists.");
@@ -45,7 +49,7 @@ namespace Chat
             }
 
             // Open the login window once again
-            Login newLogin = new Login(serverObj);
+            Login newLogin = new Login(server, port);
             newLogin.Show();
             this.Hide();
         }

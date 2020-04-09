@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
+public delegate void MainDelegate(Action action, string username, string port);
+
 public interface IClientObj
 {
-    void test(string test);
+    //void ReceiveNewSession(string username, string port);
 }

@@ -1,4 +1,4 @@
-﻿namespace Chat
+﻿namespace ChatClient
 {
     partial class Login
     {
