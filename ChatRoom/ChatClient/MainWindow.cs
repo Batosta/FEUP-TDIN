@@ -29,6 +29,7 @@ namespace ChatClient
         public MainWindow(IServerObj server, string username, string port)
         {
             InitializeComponent();
+            this.Text = username;       // change the window name to the username for more easy recognition when multiple accounts open on the same computer
 
             this.server = server;
             this.username = username;

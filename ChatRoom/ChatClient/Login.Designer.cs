@@ -112,7 +112,7 @@
             this.Controls.Add(this.username_box);
             this.Controls.Add(this.register_button);
             this.Name = "Login";
-            this.Text = "Form1";
+            this.Text = "Login";
             this.Load += new System.EventHandler(this.Login_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
