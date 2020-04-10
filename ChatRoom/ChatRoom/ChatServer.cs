@@ -70,6 +70,30 @@ public class ServerObj : MarshalByRefObject, IServerObj
         NotifyClients(Operation.SessionStart, username, port);
     }
 
+    /*
+    * Return values:
+    * -1 - Already existent username
+    * 1 - Successful register
+    */
+    public int Register(string username, string realName, string password)
+    {
+        var collection = database.GetCollection<UserModel>("User");
+
+        // check if username already exists
+        var result = collection.Find(x => x.Username == username).FirstOrDefault();
+        if (result != null)
+            return -1;
+
+        UserModel newUserModel = new UserModel
+        {
+            Username = username,
+            RealName = realName,
+            Password = HashPassword(password)
+        };
+        collection.InsertOne(newUserModel);
+        return 1;
+    }
+
     public List<UserSession> GetActiveSessions()
     {
         return activeSessions;

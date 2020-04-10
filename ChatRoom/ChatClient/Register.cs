@@ -12,9 +12,41 @@ namespace ChatClient
 {
     public partial class Register : Form
     {
-        public Register()
+        string port;
+        IServerObj server;
+
+        public Register(IServerObj server, string port)
         {
+            this.server = server;
+            this.port = port;
+
             InitializeComponent();
+        }
+
+        private void register_button_Click(object sender, EventArgs e)
+        {
+            // Make sure the user has filled every field
+            if (String.IsNullOrWhiteSpace(username_box.Text) || String.IsNullOrWhiteSpace(name_box.Text) || String.IsNullOrWhiteSpace(password_box.Text))
+            {
+                MessageBox.Show("Please fill all the boxes.");
+                return;
+            }
+
+
+            // Register
+            int registerResult = server.Register(username_box.Text, name_box.Text, password_box.Text);
+            if(registerResult == -1)
+            {
+                MessageBox.Show("Username already exists.");
+                return;
+            }
+            else
+            {
+                MessageBox.Show("Successful register.");
+                this.Hide();
+                MainWindow mainWindow = new MainWindow(server, username_box.Text, port);
+                mainWindow.Show();
+            }
         }
     }
 }

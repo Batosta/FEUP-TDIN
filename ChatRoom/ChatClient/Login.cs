@@ -45,15 +45,25 @@ namespace ChatClient
             else if(loginResult == 2)
             {
                 MessageBox.Show("You are already logged in.");
+                return;
             }
             else if (loginResult == 3)
             {
                 MessageBox.Show("The password for that username is not correct.");
+                return;
             }
             else
             {
                 MessageBox.Show("There is no user with that username.");
+                return;
             }
+        }
+
+        private void register_button_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            Register register = new Register(server, port);
+            register.Show();
         }
     }
 

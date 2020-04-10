@@ -14,5 +14,7 @@ public interface IServerObj
 
     void PerformLogin(string username, string port);
 
+    int Register(string username, string realName, string password);
+
     List<UserSession> GetActiveSessions();
 }
