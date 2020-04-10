@@ -355,8 +355,5 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
-Chat/db/
 
-Chat/Chat/obj/Debug/
-
-Chat/Chat/bin/Debug/
+ChatRoom/db/
