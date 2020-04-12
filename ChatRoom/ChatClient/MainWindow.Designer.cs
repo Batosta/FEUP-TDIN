@@ -30,6 +30,7 @@
         {
             this.activeSessionsList = new System.Windows.Forms.ListView();
             this.label1 = new System.Windows.Forms.Label();
+            this.start_conversation = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // activeSessionsList
@@ -51,11 +52,22 @@
             this.label1.TabIndex = 3;
             this.label1.Text = "Active Users";
             // 
+            // start_conversation
+            // 
+            this.start_conversation.Location = new System.Drawing.Point(151, 279);
+            this.start_conversation.Name = "start_conversation";
+            this.start_conversation.Size = new System.Drawing.Size(120, 25);
+            this.start_conversation.TabIndex = 5;
+            this.start_conversation.Text = "Start Conversation";
+            this.start_conversation.UseVisualStyleBackColor = true;
+            this.start_conversation.Click += new System.EventHandler(this.start_conversation_Click);
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(496, 394);
+            this.Controls.Add(this.start_conversation);
             this.Controls.Add(this.activeSessionsList);
             this.Controls.Add(this.label1);
             this.Name = "MainWindow";
@@ -69,5 +81,6 @@
 
         private System.Windows.Forms.ListView activeSessionsList;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Button start_conversation;
     }
 }

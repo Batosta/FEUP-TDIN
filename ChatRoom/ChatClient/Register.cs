@@ -42,6 +42,7 @@ namespace ChatClient
             }
             else
             {
+                server.PerformLogin(username_box.Text, port);
                 MessageBox.Show("Successful register.");
                 this.Hide();
                 MainWindow mainWindow = new MainWindow(server, username_box.Text, port);

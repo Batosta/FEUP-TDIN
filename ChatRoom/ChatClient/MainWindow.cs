@@ -24,7 +24,7 @@ namespace ChatClient
 
         // other variables
         List<UserSession> activeSessions;
-
+        List<ConversationWindow> activeConversationWindows;
 
         public MainWindow(IServerObj server, string username, string port)
         {
@@ -35,8 +35,23 @@ namespace ChatClient
             this.username = username;
             this.port = port;
 
+            this.activeConversationWindows = new List<ConversationWindow>();
+
             PlaceActiveSessions();
             AlterEventRepeaterSection();
+        }
+
+        private void PlaceActiveSessions()
+        {
+            this.activeSessions = server.GetActiveSessions();
+            activeSessions = server.GetActiveSessions();
+            foreach (UserSession activeSession in activeSessions)
+            {
+                if (activeSession.username != username)
+                {
+                    activeSessionsList.Items.Add(activeSession.username);
+                }
+            }
         }
 
         private void AlterEventRepeaterSection()
@@ -46,18 +61,6 @@ namespace ChatClient
             server.alterEvent += new AlterDelegate(evRepeater.Repeater);
         }
 
-        private void PlaceActiveSessions()
-        {
-            this.activeSessions = server.GetActiveSessions();
-            activeSessions = server.GetActiveSessions();
-            foreach(UserSession activeSession in activeSessions)
-            {
-                if(activeSession.username != username)
-                {
-                    activeSessionsList.Items.Add(activeSession.username);
-                }
-            }
-        }
 
 
 
@@ -86,6 +89,14 @@ namespace ChatClient
                 default:
                     break;
             }
+        }
+
+        private void start_conversation_Click(object sender, EventArgs e)
+        {
+            string selectedUsername = activeSessionsList.SelectedItems[0].Text;
+            ConversationWindow newConversationWindow = new ConversationWindow(server, selectedUsername);
+            activeConversationWindows.Add(newConversationWindow);
+            newConversationWindow.Show();
         }
     }
 
