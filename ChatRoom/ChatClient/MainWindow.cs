@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Runtime.Remoting;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace ChatClient
@@ -24,7 +20,8 @@ namespace ChatClient
 
         // other variables
         List<UserSession> activeSessions;
-        List<ConversationWindow> activeConversationWindows;
+        //List<ConversationWindow> activeConversationWindows;
+        RemMessage remMessage;
 
         public MainWindow(IServerObj server, string username, string port)
         {
@@ -35,10 +32,11 @@ namespace ChatClient
             this.username = username;
             this.port = port;
 
-            this.activeConversationWindows = new List<ConversationWindow>();
+            //activeConversationWindows = new List<ConversationWindow>();
 
             PlaceActiveSessions();
             AlterEventRepeaterSection();
+            SetupCommunication();
         }
 
         private void PlaceActiveSessions()
@@ -61,7 +59,13 @@ namespace ChatClient
             server.alterEvent += new AlterDelegate(evRepeater.Repeater);
         }
 
-
+        private void SetupCommunication()
+        {
+            string url = "tcp://localhost:" + port + "/Message";
+            remMessage = (RemMessage)RemotingServices.Connect(typeof(RemMessage), url);
+            remMessage.PutMyForm(this);
+        }
+        
 
 
         public void DoAlterations(Operation op, string username, string port)
@@ -93,13 +97,65 @@ namespace ChatClient
 
         private void start_conversation_Click(object sender, EventArgs e)
         {
-            string selectedUsername = activeSessionsList.SelectedItems[0].Text;
-            ConversationWindow newConversationWindow = new ConversationWindow(server, selectedUsername);
-            activeConversationWindows.Add(newConversationWindow);
-            newConversationWindow.Show();
+            if(activeSessionsList.SelectedItems.Count == 0)
+            {
+                MessageBox.Show("Please choose a user to chat with.");
+                return;
+            }
+            else
+            {
+                string selectedUsername = activeSessionsList.SelectedItems[0].Text;
+                SendProposal(selectedUsername);
+                
+                // LATER ALLIGATOR
+                //string selectedUsername = activeSessionsList.SelectedItems[0].Text;
+                //ConversationWindow newConversationWindow = new ConversationWindow(server, username, port, selectedUsername);
+                //activeConversationWindows.Add(newConversationWindow);
+                //newConversationWindow.Show();
+            }
+        }
+        
+        private void SendProposal(string proposalReceiverUsername)
+        {
+            ConversationProposal conversationProposal = new ConversationProposal(server, username, proposalReceiverUsername);
+            new Thread(() =>
+            {
+                conversationProposal.SendProposal();
+            }).Start();
+        }
+
+        public void ReceiveProposal(string proposalSenderUsername)
+        {
+            string message = proposalSenderUsername + " is proposing a conversation. Do you also want to chat with him/her?";
+            string caption = "Conversation Proposal";
+            DialogResult proposalResult = MessageBox.Show(message, caption, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            
+            if(proposalResult == DialogResult.Yes)       // If the proposal receiver answers Yes
+                server.YesToProposal(proposalSenderUsername, username);
+            else                                         // If the proposal receiver answers No
+                server.NoToProposal(proposalSenderUsername, username);
+        }
+
+        public void ReceiveYesToProposal(string proposalReceiverUsername, string proposalReceiverAddress)
+        {
+            MessageBox.Show("User " + proposalReceiverUsername + "has accepeted your conversation.");
+            return;
+            // Mensagem a dizer que o outro dude aceitou
+        }
+
+        public void ReceiveNoToProposal(string proposalReceiverUsername)
+        {
+            MessageBox.Show("User " + proposalReceiverUsername + " has declined your conversation.");
+            return;
+        }
+
+        public void StartAcceptedProposal(string proposalSenderUsername, string proposalSenderAddress)
+        {
+            MessageBox.Show("The accepted conversation with " + proposalSenderUsername + " can now start.");
+            return;
+            // Mensagem a dizer que ja vai começar a conversa
         }
     }
-
 
 
 
@@ -115,6 +171,26 @@ namespace ChatClient
         public void PutMyForm(MainWindow form)
         {
             win = form;
+        }
+
+        public void ReceiveProposal(string proposalSenderUsername)
+        {
+            win.ReceiveProposal(proposalSenderUsername);
+        }
+
+        public void ReceiveYesToProposal(string proposalReceiverUsername, string proposalReceiverAddress)
+        {
+            win.ReceiveYesToProposal(proposalReceiverUsername, proposalReceiverAddress);
+        }
+
+        public void ReceiveNoToProposal(string proposalReceiverUsername)
+        {
+            win.ReceiveNoToProposal(proposalReceiverUsername);
+        }
+
+        public void StartAcceptedProposal(string proposalSenderUsername, string proposalSenderAddress)
+        {
+            win.StartAcceptedProposal(proposalSenderUsername, proposalSenderAddress);
         }
     }
 }

@@ -29,6 +29,9 @@ public class ServerObj : MarshalByRefObject, IServerObj
 
 
     /*
+     * Login + Register methods
+     */
+    /*
     * Return values:
     * 1 - Correct username and password
     * 2 - Correct username and password, but user already logged it
@@ -94,6 +97,48 @@ public class ServerObj : MarshalByRefObject, IServerObj
         return 1;
     }
 
+
+    /*
+     * Conversation Initiation methods
+     */
+    public void SendProposal(string proposalSenderUsername, string proposalReceiverUsername)
+    {
+
+        Console.WriteLine("proposalSenderUsername: " + proposalSenderUsername);
+        Console.WriteLine("proposalReceiverUsername: " + proposalReceiverUsername);
+        string proposalReceiverAddress = getUserAddress(proposalReceiverUsername);
+        Console.WriteLine("proposalReceiverAddress: " + proposalReceiverAddress);
+
+
+        // CRASHOU AQUI
+        IClientObj clientObjReceiver = (IClientObj)RemotingServices.Connect(typeof(IClientObj), (string)proposalReceiverAddress);
+        clientObjReceiver.ReceiveProposal(proposalSenderUsername);
+    }
+
+    public void YesToProposal(string proposalSenderUsername, string proposalReceiverUsername)
+    {
+        string proposalSenderAddress = getUserAddress(proposalSenderUsername);
+        string proposalReceiverAddress = getUserAddress(proposalReceiverUsername);
+
+        IClientObj clientObjSender = (IClientObj)RemotingServices.Connect(typeof(IClientObj), (string)proposalSenderAddress);
+        IClientObj clientObjReceiver = (IClientObj)RemotingServices.Connect(typeof(IClientObj), (string)proposalReceiverAddress);
+
+        clientObjSender.ReceiveYesToProposal(proposalReceiverUsername, proposalReceiverAddress);
+        clientObjReceiver.StartAcceptedProposal(proposalSenderUsername, proposalSenderAddress);
+    }
+
+    public void NoToProposal(string proposalSenderUsername, string proposalReceiverUsername)
+    {
+        string proposalSenderAddress = getUserAddress(proposalSenderUsername);
+
+        IClientObj clientObjSender = (IClientObj)RemotingServices.Connect(typeof(IClientObj), (string)proposalSenderAddress);
+        clientObjSender.ReceiveNoToProposal(proposalReceiverUsername);
+    }
+
+
+
+
+
     public List<UserSession> GetActiveSessions()
     {
         return activeSessions;
@@ -104,9 +149,20 @@ public class ServerObj : MarshalByRefObject, IServerObj
 
 
 
+    private string getUserAddress(string username)
+    {
+        foreach(UserSession activeSession in activeSessions)
+        {
+            if (activeSession.username == username)
+            {
+                string url = "tcp://localhost:" + activeSession.port + "/Message";
+                return url;
+            }
+        }
+        return null;
+    }
 
-
-    public string HashPassword(string password)
+    private string HashPassword(string password)
     {
         return PasswordHandler.CreatePasswordHash(password);
     }

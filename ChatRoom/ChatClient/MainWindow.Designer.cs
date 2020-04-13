@@ -38,6 +38,7 @@
             this.activeSessionsList.Activation = System.Windows.Forms.ItemActivation.OneClick;
             this.activeSessionsList.HideSelection = false;
             this.activeSessionsList.Location = new System.Drawing.Point(151, 69);
+            this.activeSessionsList.MultiSelect = false;
             this.activeSessionsList.Name = "activeSessionsList";
             this.activeSessionsList.Size = new System.Drawing.Size(121, 192);
             this.activeSessionsList.TabIndex = 4;
@@ -56,7 +57,7 @@
             // 
             this.start_conversation.Location = new System.Drawing.Point(151, 279);
             this.start_conversation.Name = "start_conversation";
-            this.start_conversation.Size = new System.Drawing.Size(120, 25);
+            this.start_conversation.Size = new System.Drawing.Size(121, 25);
             this.start_conversation.TabIndex = 5;
             this.start_conversation.Text = "Start Conversation";
             this.start_conversation.UseVisualStyleBackColor = true;

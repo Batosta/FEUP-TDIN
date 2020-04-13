@@ -1,20 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
 
 namespace ChatClient
 {
     public partial class ConversationWindow : Form
     {
-        public ConversationWindow(IServerObj server, string username)
+        IServerObj server;
+        readonly string username;
+        readonly string port;
+        readonly string otherUsername;
+
+        public ConversationWindow(IServerObj server, string username, string port, string otherUsername)
         {
             InitializeComponent();
+
+            this.server = server;
+            this.username = username;
+            this.port = port;
+            this.otherUsername = otherUsername;
+
+            string windowText = username + " talking to " + otherUsername;
+            this.Text = windowText;
         }
     }
 }
