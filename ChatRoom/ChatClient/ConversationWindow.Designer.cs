@@ -35,12 +35,17 @@
             // 
             // message_viewer
             // 
+            this.message_viewer.Activation = System.Windows.Forms.ItemActivation.OneClick;
             this.message_viewer.HideSelection = false;
+            this.message_viewer.HoverSelection = true;
             this.message_viewer.Location = new System.Drawing.Point(50, 38);
             this.message_viewer.Name = "message_viewer";
             this.message_viewer.Size = new System.Drawing.Size(272, 196);
             this.message_viewer.TabIndex = 0;
+            this.message_viewer.TileSize = new System.Drawing.Size(1, 30);
             this.message_viewer.UseCompatibleStateImageBehavior = false;
+            this.message_viewer.View = System.Windows.Forms.View.Details;
+            this.message_viewer.SelectedIndexChanged += new System.EventHandler(this.message_viewer_SelectedIndexChanged);
             // 
             // msg_text_box
             // 
@@ -57,6 +62,7 @@
             this.send_message_button.TabIndex = 2;
             this.send_message_button.Text = "Send Message";
             this.send_message_button.UseVisualStyleBackColor = true;
+            this.send_message_button.Click += new System.EventHandler(this.send_message_button_Click);
             // 
             // ConversationWindow
             // 
@@ -68,6 +74,7 @@
             this.Controls.Add(this.message_viewer);
             this.Name = "ConversationWindow";
             this.Text = "ConversationWindow";
+            this.Load += new System.EventHandler(this.ConversationWindow_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 

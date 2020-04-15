@@ -65,7 +65,7 @@ public class ServerObj : MarshalByRefObject, IServerObj
         string address = "tcp://localhost:" + port + "/Message";
 
         // Checkar esta parte (acho nao ser necessaria)
-        IClientObj iClientObj = (IClientObj)RemotingServices.Connect(typeof(IClientObj), address);      // Obtain a reference to the client remote object
+        //IClientObj iClientObj = (IClientObj)RemotingServices.Connect(typeof(IClientObj), address);      // Obtain a reference to the client remote object
 
         UserSession newUserSession = new UserSession(username, port);
         activeSessions.Add(newUserSession);

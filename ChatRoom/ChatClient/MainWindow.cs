@@ -8,9 +8,14 @@ namespace ChatClient
 {
     public partial class MainWindow : Form
     {
+
+        private static MainWindow mInst;
+
+        ConversationWindow chatwindow;
+
         // server + port
         IServerObj server;
-        readonly string username;
+        public string username;
         readonly string port;
 
         // delegates + events
@@ -20,7 +25,7 @@ namespace ChatClient
 
         // other variables
         List<UserSession> activeSessions;
-        //List<ConversationWindow> activeConversationWindows;
+        public List<ConversationWindow> activeConversationWindows;
         RemMessage remMessage;
 
         public MainWindow(IServerObj server, string username, string port)
@@ -32,11 +37,25 @@ namespace ChatClient
             this.username = username;
             this.port = port;
 
-            //activeConversationWindows = new List<ConversationWindow>();
+            activeConversationWindows = new List<ConversationWindow>();
 
             PlaceActiveSessions();
             AlterEventRepeaterSection();
             SetupCommunication();
+        }
+        public static MainWindow CheckInst
+        {
+            get
+            {
+                return mInst;
+            }
+        }
+
+        public static MainWindow CreateInst(IServerObj server, string username, string port)
+        {
+            if (mInst == null)
+                mInst = new MainWindow(server, username, port);
+            return mInst;
         }
 
         private void PlaceActiveSessions()
@@ -136,11 +155,27 @@ namespace ChatClient
                 server.NoToProposal(proposalSenderUsername, username);
         }
 
+        public delegate void OpeningConversation(ConversationWindow chatwindow);
+
+        private void OpenConversation(ConversationWindow chatwindow)
+        {
+            if (this.InvokeRequired)
+                this.Invoke(new OpeningConversation(OpenConversation), chatwindow);
+
+            else
+            {
+                chatwindow.Show();
+            }
+        }
+
         public void ReceiveYesToProposal(string proposalReceiverUsername, string proposalReceiverAddress)
         {
-            MessageBox.Show("User " + proposalReceiverUsername + "has accepeted your conversation.");
-            return;
+            ConversationWindow chatwindow = new ConversationWindow(this, server, username, proposalReceiverAddress, proposalReceiverUsername);
+            activeConversationWindows.Add(chatwindow);
+            OpenConversation(chatwindow);
+
             // Mensagem a dizer que o outro dude aceitou
+
         }
 
         public void ReceiveNoToProposal(string proposalReceiverUsername)
@@ -151,9 +186,16 @@ namespace ChatClient
 
         public void StartAcceptedProposal(string proposalSenderUsername, string proposalSenderAddress)
         {
-            MessageBox.Show("The accepted conversation with " + proposalSenderUsername + " can now start.");
-            return;
+            ConversationWindow chatwindow = new ConversationWindow(this, server, username, proposalSenderAddress, proposalSenderUsername);
+            activeConversationWindows.Add(chatwindow);
+            OpenConversation(chatwindow);
             // Mensagem a dizer que ja vai começar a conversa
+        }
+
+        private void MainWindow_Load(object sender, EventArgs e)
+        {
+            IsMdiContainer = true;
+
         }
     }
 
@@ -167,7 +209,6 @@ namespace ChatClient
         {
             return null;
         }
-
         public void PutMyForm(MainWindow form)
         {
             win = form;
@@ -191,6 +232,18 @@ namespace ChatClient
         public void StartAcceptedProposal(string proposalSenderUsername, string proposalSenderAddress)
         {
             win.StartAcceptedProposal(proposalSenderUsername, proposalSenderAddress);
+        }
+
+        public string test(string test)
+        {
+            Console.WriteLine("received " + test);
+            return "Hi. I received your " + test;
+        }
+
+        public void receiveMessage(string message, string senderUsername)
+        {
+            ConversationWindow window = win.activeConversationWindows.Find(windoww => windoww.otherUsername == senderUsername);
+            window.writeReceivedMessage(message, senderUsername);
         }
     }
 }
