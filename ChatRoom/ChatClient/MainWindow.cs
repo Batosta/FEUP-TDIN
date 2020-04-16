@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Remoting;
 using System.Threading;
 using System.Windows.Forms;
@@ -10,8 +11,6 @@ namespace ChatClient
     {
 
         private static MainWindow mInst;
-
-        ConversationWindow chatwindow;
 
         // server + port
         IServerObj server;
@@ -25,7 +24,8 @@ namespace ChatClient
 
         // other variables
         List<UserSession> activeSessions;
-        public List<ConversationWindow> activeConversationWindows;
+        public List<IChatWindow> activeConversationWindows;
+        //public List<GroupConversationWindow> activeGroupConversationWindows;
         RemMessage remMessage;
 
         public MainWindow(IServerObj server, string username, string port)
@@ -37,7 +37,19 @@ namespace ChatClient
             this.username = username;
             this.port = port;
 
-            activeConversationWindows = new List<ConversationWindow>();
+            activeConversationWindows = new List<IChatWindow>();
+            //activeGroupConversationWindows = new List<GroupConversationWindow>();
+
+            //  Sessions list settings
+            activeSessionsList.View = View.Details;
+            ColumnHeader header = new ColumnHeader();
+            activeSessionsList.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
+            header.Text = "";
+            header.Name = "users";
+            header.Width = activeSessionsList.Width;
+            activeSessionsList.Columns.Add(header);
+            // Then
+            activeSessionsList.Scrollable = true;
 
             PlaceActiveSessions();
             AlterEventRepeaterSection();
@@ -121,7 +133,7 @@ namespace ChatClient
                 MessageBox.Show("Please choose a user to chat with.");
                 return;
             }
-            else
+            else if(activeSessionsList.SelectedItems.Count == 1)
             {
                 string selectedUsername = activeSessionsList.SelectedItems[0].Text;
                 SendProposal(selectedUsername);
@@ -132,8 +144,25 @@ namespace ChatClient
                 //activeConversationWindows.Add(newConversationWindow);
                 //newConversationWindow.Show();
             }
+            else
+            {
+                List<string> selectedUsernames = new List<string>();
+                foreach (ListViewItem selectedUsername in activeSessionsList.SelectedItems)
+                {
+                    selectedUsernames.Add(selectedUsername.Text);
+                }
+                SendGroupProposal(selectedUsernames);
+            }
         }
-        
+
+        private void SendGroupProposal(List<string> proposalReceiverUsernames)
+        {
+            new Thread(() =>
+            {
+                server.SendGroupProposal(username, proposalReceiverUsernames);
+            }).Start();
+        }
+
         private void SendProposal(string proposalReceiverUsername)
         {
             ConversationProposal conversationProposal = new ConversationProposal(server, username, proposalReceiverUsername);
@@ -141,6 +170,28 @@ namespace ChatClient
             {
                 conversationProposal.SendProposal();
             }).Start();
+        }
+
+        public void ReceiveGroupProposal(string proposalSenderUsername, List<string> porposalReceiverUsernames)
+        {
+            string others = "";
+            foreach(string other in porposalReceiverUsernames)
+            {
+                if(other != username)
+                {
+                    others += (other + ", ");
+                }
+            }
+            others = others.Remove(others.Length - 2, 2);
+
+            string message = proposalSenderUsername + " is proposing a group conversation with " + others + ". Do you also want to chat with him/her?";
+            string caption = "Conversation Group Proposal";
+            DialogResult proposalResult = MessageBox.Show(message, caption, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+            if (proposalResult == DialogResult.Yes)       // If the proposal receiver answers Yes
+                server.YesToGroupProposal(proposalSenderUsername, username);
+            else                                         // If the proposal receiver answers No
+                server.NoToProposal(proposalSenderUsername, username);
         }
 
         public void ReceiveProposal(string proposalSenderUsername)
@@ -155,9 +206,9 @@ namespace ChatClient
                 server.NoToProposal(proposalSenderUsername, username);
         }
 
-        public delegate void OpeningConversation(ConversationWindow chatwindow);
+        public delegate void OpeningConversation(Form chatwindow);
 
-        private void OpenConversation(ConversationWindow chatwindow)
+        private void OpenConversation(Form chatwindow)
         {
             if (this.InvokeRequired)
                 this.Invoke(new OpeningConversation(OpenConversation), chatwindow);
@@ -170,12 +221,37 @@ namespace ChatClient
 
         public void ReceiveYesToProposal(string proposalReceiverUsername, string proposalReceiverAddress)
         {
-            ConversationWindow chatwindow = new ConversationWindow(this, server, username, proposalReceiverAddress, proposalReceiverUsername);
+            string chatID = username + proposalReceiverUsername;
+            chatID = String.Concat(chatID.OrderBy(c => c));
+            Console.WriteLine("Chat ID returned: " + chatID);
+            ConversationWindow chatwindow = new ConversationWindow(chatID, this, server, username, proposalReceiverAddress, proposalReceiverUsername);
             activeConversationWindows.Add(chatwindow);
             OpenConversation(chatwindow);
 
             // Mensagem a dizer que o outro dude aceitou
 
+        }
+
+        internal void StartGroupChat(List<string> usernames, List<string> addresses)
+        {
+            string chatID = "";
+            for (int i = 0; i < usernames.Count; i++)
+            {
+                chatID += usernames[i];
+            }
+            for (int i = 0; i < usernames.Count; i++)
+            {
+                if(usernames[i] == username)
+                {
+                    usernames.RemoveAt(i);
+                    addresses.RemoveAt(i);
+                }
+            }
+            chatID = String.Concat(chatID.OrderBy(c => c));
+            Console.WriteLine("chat id group: " + chatID);
+            GroupConversationWindow chatwindow = new GroupConversationWindow(chatID, this, server, username, addresses, usernames);
+            activeConversationWindows.Add(chatwindow);
+            OpenConversation(chatwindow);
         }
 
         public void ReceiveNoToProposal(string proposalReceiverUsername)
@@ -185,8 +261,11 @@ namespace ChatClient
         }
 
         public void StartAcceptedProposal(string proposalSenderUsername, string proposalSenderAddress)
-        {
-            ConversationWindow chatwindow = new ConversationWindow(this, server, username, proposalSenderAddress, proposalSenderUsername);
+        {   // Esta funçao é igual À receive yes to proposal
+            string chatID = username + proposalSenderUsername;
+            chatID = String.Concat(chatID.OrderBy(c => c));
+            Console.WriteLine("Chat ID returned: " + chatID);
+            ConversationWindow chatwindow = new ConversationWindow(chatID, this, server, username, proposalSenderAddress, proposalSenderUsername);
             activeConversationWindows.Add(chatwindow);
             OpenConversation(chatwindow);
             // Mensagem a dizer que ja vai começar a conversa
@@ -214,6 +293,11 @@ namespace ChatClient
             win = form;
         }
 
+        public void ReceiveGroupProposal(string proposalSenderUsername, List<string> porposalReceiverUsernames)
+        {
+            win.ReceiveGroupProposal(proposalSenderUsername, porposalReceiverUsernames);
+        }
+
         public void ReceiveProposal(string proposalSenderUsername)
         {
             win.ReceiveProposal(proposalSenderUsername);
@@ -222,6 +306,11 @@ namespace ChatClient
         public void ReceiveYesToProposal(string proposalReceiverUsername, string proposalReceiverAddress)
         {
             win.ReceiveYesToProposal(proposalReceiverUsername, proposalReceiverAddress);
+        }
+        
+        public void StartGroupChat(List<string> usernames, List<string> addresses)
+        {
+            win.StartGroupChat(usernames, addresses);
         }
 
         public void ReceiveNoToProposal(string proposalReceiverUsername)
@@ -240,10 +329,10 @@ namespace ChatClient
             return "Hi. I received your " + test;
         }
 
-        public void receiveMessage(string message, string senderUsername)
+        public void receiveMessage(string chatID, string message, string senderUsername, bool isPrivate)
         {
-            ConversationWindow window = win.activeConversationWindows.Find(windoww => windoww.otherUsername == senderUsername);
-            window.writeReceivedMessage(message, senderUsername);
+            IChatWindow window = win.activeConversationWindows.Find(windoww => windoww.getID() == chatID);
+            window.writeReceivedMessage(message, senderUsername, isPrivate);
         }
     }
 }

@@ -32,6 +32,13 @@ namespace ChatClient
                 return;
             }
 
+            // No white spaces in username
+            if (username_box.Text.Contains(" "))
+            {
+                MessageBox.Show("Please no white spaces in username.");
+                return;
+            }
+
 
             // Register
             int registerResult = server.Register(username_box.Text, name_box.Text, password_box.Text);

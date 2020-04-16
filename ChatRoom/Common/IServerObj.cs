@@ -22,6 +22,9 @@ public interface IServerObj
     void SendProposal(string proposalSenderUsername, string proposalReceiverUsername);
     void YesToProposal(string proposalSenderUsername, string proposalReceiverUsername);
     void NoToProposal(string proposalSenderUsername, string proposalReceiverUsername);
+    void SendGroupProposal(string proposalSenderUsername, List<string> proposalReceiverUsernames);
+    void YesToGroupProposal(string proposalSenderUsername, string proposalReceiverUsername);
+    void NoToGroupProposal(string proposalSenderUsername, string proposalReceiverUsername);
 
 
 

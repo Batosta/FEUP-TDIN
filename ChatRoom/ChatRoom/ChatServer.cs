@@ -1,8 +1,9 @@
-﻿using System;
+﻿using MongoDB.Driver;
+using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Runtime.Remoting;
 using System.Threading;
-using MongoDB.Driver;
 
 class ChatServer
 {
@@ -26,6 +27,7 @@ public class ServerObj : MarshalByRefObject, IServerObj
     public event AlterDelegate alterEvent;
 
     List<UserSession> activeSessions = new List<UserSession>();
+    ConcurrentDictionary<string, Dictionary<string, bool>> groupProposals = new ConcurrentDictionary<string, Dictionary<string, bool>>();
 
 
     /*
@@ -97,6 +99,70 @@ public class ServerObj : MarshalByRefObject, IServerObj
         return 1;
     }
 
+    public void SendGroupProposal(string proposalSenderUsername, List<string> proposalReceiverUsernames)
+    {
+        Dictionary<string, bool> usersToAccept = new Dictionary<string, bool>();
+        foreach (string receiverUsername in proposalReceiverUsernames)
+        {
+            usersToAccept[receiverUsername] = false;
+            string receiverAddress = getUserAddress(receiverUsername);
+            IClientObj clientObjReceiver = (IClientObj)RemotingServices.Connect(typeof(IClientObj), (string)receiverAddress);
+
+            new Thread(() =>
+            {
+                clientObjReceiver.ReceiveGroupProposal(proposalSenderUsername, proposalReceiverUsernames);
+            }).Start();
+        }
+        groupProposals[proposalSenderUsername] = usersToAccept;
+    }
+    public void YesToGroupProposal(string proposalSenderUsername, string proposalReceiverUsername)
+    {
+        List<string> addresses = new List<string>();
+        List<string> usernames = new List<string>();
+        Console.WriteLine("Yes to group proposal from: " + proposalSenderUsername);
+        groupProposals[proposalSenderUsername][proposalReceiverUsername] = true;
+        bool procceed = true;
+        //while (true)
+        //{
+        usernames.Add(proposalSenderUsername);
+        addresses.Add(getUserAddress(proposalSenderUsername));
+        foreach (KeyValuePair<string, bool> entry in groupProposals[proposalSenderUsername])
+        {
+            Console.WriteLine(entry);
+            usernames.Add(entry.Key);
+            addresses.Add(getUserAddress(entry.Key));
+            if (entry.Value == false)
+            {
+                procceed = false;
+                return;
+            }
+        }
+        //Thread.Sleep(1000);
+        //if (procceed)
+        //{
+        //    break;
+        //}
+        //}
+
+        Console.WriteLine("All accepted. Notifying everyone...");
+
+        IClientObj clientObjSender = (IClientObj)RemotingServices.Connect(typeof(IClientObj), (string)getUserAddress(proposalSenderUsername));
+
+        foreach (KeyValuePair<string, bool> entry in groupProposals[proposalSenderUsername])
+        {
+            IClientObj clientObjReceiver = (IClientObj)RemotingServices.Connect(typeof(IClientObj), (string)getUserAddress(entry.Key));
+            clientObjReceiver.StartGroupChat(usernames, addresses);
+        }
+
+        // Events?
+
+        clientObjSender.StartGroupChat(usernames, addresses);
+    }
+
+    public void NoToGroupProposal(string proposalSenderUsername, string proposalReceiverUsername)
+    {
+        throw new NotImplementedException();
+    }
 
     /*
      * Conversation Initiation methods
@@ -135,23 +201,14 @@ public class ServerObj : MarshalByRefObject, IServerObj
         clientObjSender.ReceiveNoToProposal(proposalReceiverUsername);
     }
 
-
-
-
-
     public List<UserSession> GetActiveSessions()
     {
         return activeSessions;
     }
 
-
-
-
-
-
     private string getUserAddress(string username)
     {
-        foreach(UserSession activeSession in activeSessions)
+        foreach (UserSession activeSession in activeSessions)
         {
             if (activeSession.username == username)
             {
@@ -169,11 +226,11 @@ public class ServerObj : MarshalByRefObject, IServerObj
 
     void NotifyClients(Operation op, string username, string port)
     {
-        if(alterEvent != null)
+        if (alterEvent != null)
         {
             Delegate[] invkList = alterEvent.GetInvocationList();
 
-            foreach(AlterDelegate handler in invkList)
+            foreach (AlterDelegate handler in invkList)
             {
                 new Thread(() =>
                 {
@@ -181,7 +238,7 @@ public class ServerObj : MarshalByRefObject, IServerObj
                     {
                         handler(op, username, port);
                     }
-                    catch(Exception exception)
+                    catch (Exception exception)
                     {
                         alterEvent -= handler;
                         Console.WriteLine("[Exception]: " + exception);

@@ -4,7 +4,7 @@ using System.Windows.Forms;
 
 namespace ChatClient
 {
-    public partial class ConversationWindow : Form
+    public partial class ConversationWindow : Form, IChatWindow
     {
         MainWindow window;
         IServerObj server;
@@ -12,11 +12,12 @@ namespace ChatClient
         readonly string address;
         public readonly string otherUsername;
         IClientObj otherClient;
+        string chatID;
 
-        public ConversationWindow(MainWindow win, IServerObj server, string username, string address, string otherUsername)
+        public ConversationWindow(string chatID, MainWindow win, IServerObj server, string username, string address, string otherUsername)
         {
+            this.chatID = chatID;
             window = win;
-            Console.WriteLine(win);
             InitializeComponent();
 
             this.server = server;
@@ -25,8 +26,10 @@ namespace ChatClient
             this.otherUsername = otherUsername;
 
             string windowText = username + " talking to " + otherUsername;
-            this.Text = windowText;
+            this.AcceptButton = send_message_button;
 
+            this.Text = windowText;
+            
             message_viewer.View = View.Details;
             ColumnHeader header = new ColumnHeader();
             message_viewer.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
@@ -41,7 +44,7 @@ namespace ChatClient
         private void send_message_button_Click(object sender, System.EventArgs e)
         {
             string messageToSend = msg_text_box.Text;
-            otherClient.receiveMessage(messageToSend, username);
+            otherClient.receiveMessage(this.chatID, messageToSend, username, false);
         }
 
         private void ConversationWindow_Load(object sender, System.EventArgs e)
@@ -53,7 +56,7 @@ namespace ChatClient
         {
         }
 
-        public void writeReceivedMessage(string message, string senderUsername)
+        public void writeReceivedMessage(string message, string senderUsername, bool isPrivate)
         {
             DateTime localDate = DateTime.Now;
             string time = localDate.ToString("%h:%m:%s");
@@ -64,6 +67,11 @@ namespace ChatClient
         private void message_viewer_SelectedIndexChanged(object sender, EventArgs e)
         {
 
+        }
+
+        public string getID()
+        {
+            return chatID;
         }
     }
 }

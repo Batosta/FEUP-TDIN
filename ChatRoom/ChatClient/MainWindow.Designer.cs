@@ -38,7 +38,6 @@
             this.activeSessionsList.Activation = System.Windows.Forms.ItemActivation.OneClick;
             this.activeSessionsList.HideSelection = false;
             this.activeSessionsList.Location = new System.Drawing.Point(151, 69);
-            this.activeSessionsList.MultiSelect = false;
             this.activeSessionsList.Name = "activeSessionsList";
             this.activeSessionsList.Size = new System.Drawing.Size(121, 192);
             this.activeSessionsList.TabIndex = 4;
