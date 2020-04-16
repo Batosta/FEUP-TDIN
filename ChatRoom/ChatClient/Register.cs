@@ -14,7 +14,7 @@ namespace ChatClient
     {
         string port;
         IServerObj server;
-
+        
         public Register(IServerObj server, string port)
         {
             this.server = server;
