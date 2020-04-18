@@ -26,7 +26,7 @@ public interface IServerObj
     void YesToGroupProposal(string proposalSenderUsername, string proposalReceiverUsername);
     void NoToGroupProposal(string proposalSenderUsername, string proposalReceiverUsername);
 
-
+    void storeMessage(MessageModel message);
 
     List<UserSession> GetActiveSessions();
 }
