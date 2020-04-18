@@ -2,7 +2,9 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Remoting;
+using System.Runtime.Remoting.Messaging;
 using System.Threading;
 
 class ChatServer
@@ -50,7 +52,7 @@ public class ServerObj : MarshalByRefObject, IServerObj
         {
             if (PasswordHandler.Validate(password, user.Password))
             {
-                if (!(activeSessions.Contains(new UserSession(username, port))))
+                if (!activeSessions.Contains(new UserSession(username, port)))
                     return 1;
                 else
                     return 2;
@@ -121,9 +123,6 @@ public class ServerObj : MarshalByRefObject, IServerObj
         List<string> usernames = new List<string>();
         Console.WriteLine("Yes to group proposal from: " + proposalSenderUsername);
         groupProposals[proposalSenderUsername][proposalReceiverUsername] = true;
-        bool procceed = true;
-        //while (true)
-        //{
         usernames.Add(proposalSenderUsername);
         addresses.Add(getUserAddress(proposalSenderUsername));
         foreach (KeyValuePair<string, bool> entry in groupProposals[proposalSenderUsername])
@@ -133,30 +132,63 @@ public class ServerObj : MarshalByRefObject, IServerObj
             addresses.Add(getUserAddress(entry.Key));
             if (entry.Value == false)
             {
-                procceed = false;
                 return;
             }
         }
-        //Thread.Sleep(1000);
-        //if (procceed)
-        //{
-        //    break;
-        //}
-        //}
 
         Console.WriteLine("All accepted. Notifying everyone...");
 
         IClientObj clientObjSender = (IClientObj)RemotingServices.Connect(typeof(IClientObj), (string)getUserAddress(proposalSenderUsername));
 
-        foreach (KeyValuePair<string, bool> entry in groupProposals[proposalSenderUsername])
+        string chatID = "";
+        for (int i = 0; i < usernames.Count; i++)
         {
-            IClientObj clientObjReceiver = (IClientObj)RemotingServices.Connect(typeof(IClientObj), (string)getUserAddress(entry.Key));
-            clientObjReceiver.StartGroupChat(usernames, addresses);
+            chatID += usernames[i];
         }
+        chatID = String.Concat(chatID.OrderBy(c => c));
+        Console.WriteLine("chat id group: " + chatID);
 
-        // Events?
+        //  Create chat in database
+        var collection = database.GetCollection<ChatModel>("Chat");
+        ChatModel chatmodel = collection.Find(chat => chat.ChatID == chatID).FirstOrDefault();
+        if (chatmodel == null)
+        {
+            List<string> users = new List<string>();
+            List<MessageModel> messages = new List<MessageModel>();
+            foreach(string receiverUsername in usernames)
+            {
+                users.Add(receiverUsername);
+            }
+            collection.InsertOne(new ChatModel
+            {
+                ChatID = chatID,
+                Users = users,
+                Messages = messages
+            });
+            Console.WriteLine("Chat ID created and added to database: " + chatID);
 
-        clientObjSender.StartGroupChat(usernames, addresses);
+            foreach (KeyValuePair<string, bool> entry in groupProposals[proposalSenderUsername])
+            {
+                IClientObj clientObjReceiver = (IClientObj)RemotingServices.Connect(typeof(IClientObj), (string)getUserAddress(entry.Key));
+                clientObjReceiver.StartGroupChat(usernames, addresses, chatID, null);
+            }
+
+            // Events?
+
+            clientObjSender.StartGroupChat(usernames, addresses, chatID, null);
+        }
+        else
+        {
+            foreach (KeyValuePair<string, bool> entry in groupProposals[proposalSenderUsername])
+            {
+                IClientObj clientObjReceiver = (IClientObj)RemotingServices.Connect(typeof(IClientObj), (string)getUserAddress(entry.Key));
+                clientObjReceiver.StartGroupChat(usernames, addresses, chatID, chatmodel);
+            }
+
+            // Events?
+
+            clientObjSender.StartGroupChat(usernames, addresses, chatID, chatmodel);
+        }
     }
 
     public void NoToGroupProposal(string proposalSenderUsername, string proposalReceiverUsername)
@@ -189,8 +221,33 @@ public class ServerObj : MarshalByRefObject, IServerObj
         IClientObj clientObjSender = (IClientObj)RemotingServices.Connect(typeof(IClientObj), (string)proposalSenderAddress);
         IClientObj clientObjReceiver = (IClientObj)RemotingServices.Connect(typeof(IClientObj), (string)proposalReceiverAddress);
 
-        clientObjSender.ReceiveYesToProposal(proposalReceiverUsername, proposalReceiverAddress);
-        clientObjReceiver.StartAcceptedProposal(proposalSenderUsername, proposalSenderAddress);
+        string chatID = proposalSenderUsername + proposalReceiverUsername;
+        chatID = String.Concat(chatID.OrderBy(c => c));
+
+        //  Create chat in database
+        var collection = database.GetCollection<ChatModel>("Chat");
+        ChatModel chatmodel = collection.Find(chat => chat.ChatID == chatID).FirstOrDefault();
+        if (chatmodel == null)
+        {
+            List<string> users = new List<string>();
+            List<MessageModel> messages = new List<MessageModel>();
+            users.Add(proposalSenderUsername);
+            users.Add(proposalReceiverUsername);
+            collection.InsertOne(new ChatModel
+            {
+                ChatID = chatID,
+                Users = users,
+                Messages = messages
+            });
+            Console.WriteLine("Chat ID created and added to database: " + chatID);
+
+            clientObjSender.ReceiveYesToProposal(proposalReceiverUsername, proposalReceiverAddress, chatID, null);
+            clientObjReceiver.StartAcceptedProposal(proposalSenderUsername, proposalSenderAddress, chatID, null);
+        } else
+        {
+            clientObjSender.ReceiveYesToProposal(proposalReceiverUsername, proposalReceiverAddress, chatID, chatmodel);
+            clientObjReceiver.StartAcceptedProposal(proposalSenderUsername, proposalSenderAddress, chatID, chatmodel);
+        }
     }
 
     public void NoToProposal(string proposalSenderUsername, string proposalReceiverUsername)
@@ -200,6 +257,15 @@ public class ServerObj : MarshalByRefObject, IServerObj
         IClientObj clientObjSender = (IClientObj)RemotingServices.Connect(typeof(IClientObj), (string)proposalSenderAddress);
         clientObjSender.ReceiveNoToProposal(proposalReceiverUsername);
     }
+
+
+    public void storeMessage(MessageModel message)
+    {
+        var collection = database.GetCollection<ChatModel>("Chat");
+        var update = Builders<ChatModel>.Update.Push("Messages", message);
+        collection.FindOneAndUpdate(chat => chat.ChatID == message.ChatID, update);
+    }
+
 
     public List<UserSession> GetActiveSessions()
     {

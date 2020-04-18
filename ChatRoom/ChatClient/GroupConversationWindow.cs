@@ -14,9 +14,12 @@ namespace ChatClient
         readonly List<string> addresses;
         public readonly List<string> otherUsernames;
         Dictionary<string, IClientObj> otherClients = new Dictionary<string, IClientObj>();
-        string chatID;
-        public GroupConversationWindow(string chatID, MainWindow win, IServerObj server, string username, List<string> addresses, List<string> otherUsernames)
+        readonly string chatID;
+        bool userbyebyed = false;
+        ChatModel chatmodel;
+        public GroupConversationWindow(string chatID, MainWindow win, IServerObj server, string username, List<string> addresses, List<string> otherUsernames, ChatModel chatmodel)
         {
+            this.chatmodel = chatmodel;
             this.chatID = chatID;
             window = win;
             InitializeComponent();
@@ -48,11 +51,39 @@ namespace ChatClient
             }
 
             message_viewer.Items.Add("Chatting with " + stringUsernames);
+
+            WriteOldMessages();
         }
-        public void writeReceivedMessage(string message, string senderUsername, bool isPrivate)
+        private void WriteOldMessages()
         {
-            DateTime localDate = DateTime.Now;
-            string time = localDate.ToString("%h:%m:%s");
+            foreach (MessageModel message in this.chatmodel.Messages)
+            {
+                if(message.Receivers.Count == 1) // its private
+                {
+                    if (message.Receivers.Contains(username)) // its for me
+                    {
+                        message_viewer.Items.Add("(pm) " + message.Sender + ": " + message.Text + " - " + message.Time);
+                    }
+                    else if (message.Sender == username)
+                    {
+                        message_viewer.Items.Add("Me to " + message.Receivers[0] + ": " + message.Text + " - " + message.Time);
+                    }
+                }
+                else
+                {
+                    if(message.Sender == username)
+                    {
+                        message_viewer.Items.Add("Me: " + message.Text + " - " + message.Time);
+                    }
+                    else
+                    {
+                        message_viewer.Items.Add(message.Sender + ": " + message.Text + " - " + message.Time);
+                    }
+                }
+            }
+        }
+        public void writeReceivedMessage(string message, string time, string senderUsername, bool isPrivate)
+        {
 
             if (isPrivate)
             {
@@ -64,31 +95,55 @@ namespace ChatClient
             }
         }
 
-        private void message_viewer_SelectedIndexChanged(object sender, EventArgs e)
+        private void Message_viewer_SelectedIndexChanged(object sender, EventArgs e)
         {
         }
 
-        private void send_message_button_Click(object sender, EventArgs e)
+        private void Send_message_button_Click(object sender, EventArgs e)
         {
+            DateTime localDate = DateTime.Now;
+            string time = localDate.ToString("%h:%m:%s");
+
             string messageToSend = msg_text_box.Text;
             if(messageToSend == "")
             {
                 return;
             }
             string name = checkPrivate(messageToSend);
-            if (name == "n")
+            List<string> receivers = new List<string>();
+            if (name == "n")    //  not private
             {
                 foreach (KeyValuePair<string, IClientObj> entry in otherClients)
                 {
-                    entry.Value.receiveMessage(chatID, messageToSend, username, false);
+                    receivers.Add(entry.Key);
+                    message_viewer.Items.Add("Me: " + msg_text_box.Text + " - " + time);
+                    entry.Value.receiveMessage(chatID, messageToSend, time, username, false);
                 }
+                server.storeMessage(new MessageModel
+                {
+                    Sender = username,
+                    Receivers = receivers,
+                    Text = messageToSend,
+                    Time = time,
+                    ChatID = this.chatID
+                });
             }
             else if(name != "c")
             {
                 messageToSend = messageToSend.Substring(5 + name.Length);
-                if (otherClients.ContainsKey(name))
+                if (otherClients.ContainsKey(name))    //  private and valid
                 {
-                    otherClients[name].receiveMessage(chatID, messageToSend, username, true);
+                    receivers.Add(name);
+                    server.storeMessage(new MessageModel
+                    {
+                        Sender = username,
+                        Receivers = receivers,
+                        Text = messageToSend,
+                        Time = time,
+                        ChatID = this.chatID
+                    });
+                    otherClients[name].receiveMessage(chatID, messageToSend, time, username, true);
+                    message_viewer.Items.Add("Me to " + name + ": " + msg_text_box.Text + " - " + time);
                 }
             }
             msg_text_box.Text = "";
@@ -117,6 +172,28 @@ namespace ChatClient
             {
                 return "n";
             }
+        }
+        private void GroupConversationWindow_FormClosing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            Console.WriteLine("wtf");
+            if (!userbyebyed)
+            {
+                foreach (KeyValuePair<string, IClientObj> entry in otherClients)
+                {
+                    entry.Value.ByeBye(chatID);
+                }
+                window.activeConversationWindows.Remove(this);
+            }
+            else
+            {
+                window.activeConversationWindows.Remove(this);
+            }
+        }
+
+        public void userByebyed()
+        {
+            userbyebyed = true;
+            window.Invoke((MethodInvoker)delegate { this.Close(); });
         }
 
         public string getID()

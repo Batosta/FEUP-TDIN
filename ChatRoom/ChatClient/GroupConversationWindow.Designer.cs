@@ -46,7 +46,7 @@
             this.message_viewer.TileSize = new System.Drawing.Size(1, 30);
             this.message_viewer.UseCompatibleStateImageBehavior = false;
             this.message_viewer.View = System.Windows.Forms.View.Details;
-            this.message_viewer.SelectedIndexChanged += new System.EventHandler(this.message_viewer_SelectedIndexChanged);
+            this.message_viewer.SelectedIndexChanged += new System.EventHandler(this.Message_viewer_SelectedIndexChanged);
             // 
             // send_message_button
             // 
@@ -56,7 +56,7 @@
             this.send_message_button.TabIndex = 4;
             this.send_message_button.Text = "Send Message";
             this.send_message_button.UseVisualStyleBackColor = true;
-            this.send_message_button.Click += new System.EventHandler(this.send_message_button_Click);
+            this.send_message_button.Click += new System.EventHandler(this.Send_message_button_Click);
             // 
             // msg_text_box
             // 
@@ -86,6 +86,7 @@
             this.Name = "GroupConversationWindow";
             this.Text = "Group chat";
             this.Load += new System.EventHandler(this.GroupConversationWindow_Load);
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.GroupConversationWindow_FormClosing);
             this.ResumeLayout(false);
             this.PerformLayout();
 

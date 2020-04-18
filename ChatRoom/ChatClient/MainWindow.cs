@@ -219,12 +219,9 @@ namespace ChatClient
             }
         }
 
-        public void ReceiveYesToProposal(string proposalReceiverUsername, string proposalReceiverAddress)
+        public void ReceiveYesToProposal(string proposalReceiverUsername, string proposalReceiverAddress, string chatID, ChatModel chatmodel)
         {
-            string chatID = username + proposalReceiverUsername;
-            chatID = String.Concat(chatID.OrderBy(c => c));
-            Console.WriteLine("Chat ID returned: " + chatID);
-            ConversationWindow chatwindow = new ConversationWindow(chatID, this, server, username, proposalReceiverAddress, proposalReceiverUsername);
+            ConversationWindow chatwindow = new ConversationWindow(chatID, this, server, username, proposalReceiverAddress, proposalReceiverUsername, chatmodel);
             activeConversationWindows.Add(chatwindow);
             OpenConversation(chatwindow);
 
@@ -232,24 +229,17 @@ namespace ChatClient
 
         }
 
-        internal void StartGroupChat(List<string> usernames, List<string> addresses)
+        internal void StartGroupChat(List<string> usernames, List<string> addresses, string chatID, ChatModel chatmodel)
         {
-            string chatID = "";
             for (int i = 0; i < usernames.Count; i++)
             {
-                chatID += usernames[i];
-            }
-            for (int i = 0; i < usernames.Count; i++)
-            {
-                if(usernames[i] == username)
+                if (usernames[i] == username)
                 {
                     usernames.RemoveAt(i);
                     addresses.RemoveAt(i);
                 }
             }
-            chatID = String.Concat(chatID.OrderBy(c => c));
-            Console.WriteLine("chat id group: " + chatID);
-            GroupConversationWindow chatwindow = new GroupConversationWindow(chatID, this, server, username, addresses, usernames);
+            GroupConversationWindow chatwindow = new GroupConversationWindow(chatID, this, server, username, addresses, usernames, chatmodel);
             activeConversationWindows.Add(chatwindow);
             OpenConversation(chatwindow);
         }
@@ -260,12 +250,9 @@ namespace ChatClient
             return;
         }
 
-        public void StartAcceptedProposal(string proposalSenderUsername, string proposalSenderAddress)
-        {   // Esta funçao é igual À receive yes to proposal
-            string chatID = username + proposalSenderUsername;
-            chatID = String.Concat(chatID.OrderBy(c => c));
-            Console.WriteLine("Chat ID returned: " + chatID);
-            ConversationWindow chatwindow = new ConversationWindow(chatID, this, server, username, proposalSenderAddress, proposalSenderUsername);
+        public void StartAcceptedProposal(string proposalSenderUsername, string proposalSenderAddress, string chatID, ChatModel chatmodel)
+        {   
+            ConversationWindow chatwindow = new ConversationWindow(chatID, this, server, username, proposalSenderAddress, proposalSenderUsername, chatmodel);
             activeConversationWindows.Add(chatwindow);
             OpenConversation(chatwindow);
             // Mensagem a dizer que ja vai começar a conversa
@@ -303,14 +290,14 @@ namespace ChatClient
             win.ReceiveProposal(proposalSenderUsername);
         }
 
-        public void ReceiveYesToProposal(string proposalReceiverUsername, string proposalReceiverAddress)
+        public void ReceiveYesToProposal(string proposalReceiverUsername, string proposalReceiverAddress, string chatID, ChatModel chatmodel)
         {
-            win.ReceiveYesToProposal(proposalReceiverUsername, proposalReceiverAddress);
+            win.ReceiveYesToProposal(proposalReceiverUsername, proposalReceiverAddress, chatID, chatmodel);
         }
         
-        public void StartGroupChat(List<string> usernames, List<string> addresses)
+        public void StartGroupChat(List<string> usernames, List<string> addresses, string chatID, ChatModel chatmodel)
         {
-            win.StartGroupChat(usernames, addresses);
+            win.StartGroupChat(usernames, addresses, chatID, chatmodel);
         }
 
         public void ReceiveNoToProposal(string proposalReceiverUsername)
@@ -318,9 +305,9 @@ namespace ChatClient
             win.ReceiveNoToProposal(proposalReceiverUsername);
         }
 
-        public void StartAcceptedProposal(string proposalSenderUsername, string proposalSenderAddress)
+        public void StartAcceptedProposal(string proposalSenderUsername, string proposalSenderAddress, string chatID, ChatModel chatmodel)
         {
-            win.StartAcceptedProposal(proposalSenderUsername, proposalSenderAddress);
+            win.StartAcceptedProposal(proposalSenderUsername, proposalSenderAddress, chatID, chatmodel);
         }
 
         public string test(string test)
@@ -329,10 +316,16 @@ namespace ChatClient
             return "Hi. I received your " + test;
         }
 
-        public void receiveMessage(string chatID, string message, string senderUsername, bool isPrivate)
+        public void receiveMessage(string chatID, string message, string time, string senderUsername, bool isPrivate)
         {
             IChatWindow window = win.activeConversationWindows.Find(windoww => windoww.getID() == chatID);
-            window.writeReceivedMessage(message, senderUsername, isPrivate);
+            window.writeReceivedMessage(message, time, senderUsername, isPrivate);
+        }
+
+        public void ByeBye(string chatID)
+        {
+            IChatWindow window = win.activeConversationWindows.Find(windoww => windoww.getID() == chatID);
+            window.userByebyed();
         }
     }
 }

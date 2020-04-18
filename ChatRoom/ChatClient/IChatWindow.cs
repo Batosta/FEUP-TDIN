@@ -2,8 +2,9 @@
 {
     public interface IChatWindow
     {
-        void writeReceivedMessage(string message, string username, bool isPrivate);
+        void writeReceivedMessage(string message,string time, string username, bool isPrivate);
 
         string getID();
+        void userByebyed();
     }
 }
