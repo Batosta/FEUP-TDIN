@@ -13,5 +13,5 @@ public interface IClientObj
     void ReceiveMessage(string chatName, string username, string messageText, string messageTime, bool isPrivate);
 
     void LeaveConversation(string chatName);
-    void ReceiveFile(string chatName, byte[] fileToSend, string extension, string v1, string username, bool v2);
+    void ReceiveFile(string chatName, string username, byte[] fileToSend, string extension, string messageTime);
 }

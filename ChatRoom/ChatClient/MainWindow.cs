@@ -178,19 +178,6 @@ namespace ChatClient
                 server.NoToProposal(proposalSenderUsername, username);
         }
 
-        public delegate void OpeningConversation(Form chatwindow);
-
-        private void OpenConversation(Form chatwindow)
-        {
-            if (this.InvokeRequired)
-                this.Invoke(new OpeningConversation(OpenConversation), chatwindow);
-
-            else
-            {
-                chatwindow.Show();
-            }
-        }
-
         public void StartChat(string chatName, List<string> usernames, List<string> addresses, List<MessageModel> previousMessages)
         {
             for (int i = 0; i < usernames.Count; i++)
@@ -205,7 +192,10 @@ namespace ChatClient
 
             ConversationWindow conversationWindow = new ConversationWindow(this, server, chatName, username, usernames, addresses, previousMessages);
             activeConversationWindows.Add(conversationWindow);
-            OpenConversation(conversationWindow);
+            this.Invoke((MethodInvoker)delegate
+            {
+                conversationWindow.Show();
+            });
         }
 
 
@@ -284,10 +274,10 @@ namespace ChatClient
             window.LeaveConversation();
         }
 
-        public void ReceiveFile(string chatName, byte[] file, string extension, string v1, string username, bool v2)
+        public void ReceiveFile(string chatName, string username, byte[] file, string extension, string messageTime)
         {
             ConversationWindow window = win.activeConversationWindows.Find(windoww => windoww.GetChatName() == chatName);
-            window.ReceiveFile(file, extension);
+            window.ReceiveFile(username, file, extension, messageTime);
         }
     }
 }

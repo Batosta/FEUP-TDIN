@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
-using System.Runtime.CompilerServices;
 using System.Runtime.Remoting;
 using System.Threading;
 using System.Windows.Forms;
@@ -41,13 +39,13 @@ namespace ChatClient
             this.AcceptButton = send_message_button;
 
             SetupMessageViewer();
-            if(previousMessages != null)
+            if (previousMessages != null)
                 WritePreviousMessages(previousMessages);
         }
 
         private void ConversationWindow_Load(object sender, System.EventArgs e)
         {
-            for(int i = 0; i < otherUsernames.Count; i++)
+            for (int i = 0; i < otherUsernames.Count; i++)
             {
                 IClientObj newClient = (IClientObj)RemotingServices.Connect(typeof(IClientObj), otherUsersAddresses[i]);
                 otherClients.Add(otherUsernames[i], newClient);
@@ -75,7 +73,7 @@ namespace ChatClient
                 }
                 server.StoreMessage(chatName, username, messageText, messageTime, false, otherUsernames);
             }
-            else if(name != "/nomessage")
+            else if (name != "/nomessage")
             {
                 messageText = messageText.Substring(5 + name.Length);
                 List<string> receivers = new List<string>();
@@ -90,12 +88,12 @@ namespace ChatClient
 
             msg_text_box.Text = "";
         }
-        
+
         private void ConversationWindow_FormClosing(Object sender, FormClosingEventArgs e)
         {
             if (!userLeft)
             {
-                foreach(KeyValuePair<string, IClientObj> entry in otherClients)
+                foreach (KeyValuePair<string, IClientObj> entry in otherClients)
                 {
                     entry.Value.LeaveConversation(chatName);
                 }
@@ -136,12 +134,12 @@ namespace ChatClient
                 message_viewer.Items.Add(messageToBeDisplay);
             });
         }
-        
+
         public string GetChatName()
         {
             return chatName;
         }
-        
+
         public List<string> GetOtherUsernames()
         {
             return otherUsernames;
@@ -201,63 +199,59 @@ namespace ChatClient
         private string GetConversationTitle()
         {
             string windowText = username + " talking to ";
-            foreach(string username in otherUsernames)
+            foreach (string username in otherUsernames)
             {
                 windowText += username + ", ";
             }
             return windowText.Remove(windowText.Length - 2);
         }
 
-        public void ReceiveFile(byte[] file, string extension)
+        public void ReceiveFile(string username, byte[] file, string filename, string time)
         {
-            //  Testing file received
-            Thread t = new Thread((ThreadStart)(() =>
-            {
-                var folderBrowserDialog1 = new FolderBrowserDialog();
+            string extension = Path.GetExtension(filename);
 
-                // Show the FolderBrowserDialog.
-                DialogResult result = folderBrowserDialog1.ShowDialog();
-                if (result == DialogResult.OK)
+            DialogResult proposalResult = MessageBox.Show("The user " + username + " wants to send you a " + extension + " file. Do you want to download it?", "Receiving file", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+            if (proposalResult == DialogResult.Yes)
+            {
+                //  Testing file received
+                Thread t = new Thread((ThreadStart)(() =>
                 {
-                    string folderName = folderBrowserDialog1.SelectedPath;
-                    File.WriteAllBytes(folderName + "/test" + extension, file);
-                }
-            }));
-            t.SetApartmentState(ApartmentState.STA);
-            t.Start();
+                    var sfd = new SaveFileDialog();
+                    sfd.FileName = filename;
+
+                    DialogResult result = sfd.ShowDialog();
+                    if (result == DialogResult.OK)
+                    {
+                        string fileName = sfd.FileName;
+                        File.WriteAllBytes(fileName, file);
+                    }
+                }));
+                t.SetApartmentState(ApartmentState.STA);
+                t.Start();
+            }
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-
             OpenFileDialog openFileDialog1 = new OpenFileDialog();
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
-                string extension = Path.GetExtension(openFileDialog1.FileName);
                 fileToSend = File.ReadAllBytes(openFileDialog1.FileName);
-                Console.WriteLine("length: " + fileToSend.Length);
+                string messageTime = DateTime.Now.ToString("%h:%m:%s");
 
                 foreach (KeyValuePair<string, IClientObj> entry in otherClients)
                 {
-                    entry.Value.ReceiveFile(chatName,
-                                        fileToSend,
-                                        extension,
-                                        "time",
-                                        username,
-                                        false);
+                    new Thread(() =>
+                    {
+                        entry.Value.ReceiveFile(chatName,
+                                            username,
+                                            fileToSend,
+                                            openFileDialog1.FileName,
+                                            messageTime);
+                    }).Start();
                 }
             }
-            
-                /*openFileDialog1.Filter =
-     "Images (*.BMP;*.JPG;*.GIF,*.PNG,*.TIFF)|*.BMP;*.JPG;*.GIF;*.PNG;*.TIFF";
-                if (openFileDialog1.ShowDialog() == DialogResult.OK)
-                {
-                    PictureBox PictureBox1 = new PictureBox();
-                    PictureBox1.Image = new Bitmap(openFileDialog1.FileName);
-
-                    // Add the new control to its parent's controls collection
-                    this.Controls.Add(PictureBox1);
-                }*/
-            }
-    }
+        }
+    }                                                                         
 }
