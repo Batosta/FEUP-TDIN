@@ -1,0 +1,19 @@
+TODO:
+checkar se o user ja nao esta loggado
+ui
+voltar a p�r as private msgs
+checkar o que acontece quando alguem nao aceita
+login com enter (nao importante)
+meter ficheiros (nao importante)
+
+RELATORIO
+
+
+
+
+DONE:
+uniformizar as proposals
+nos groupchats remover as msgs proprias duplicadas
+tentar juntar as 2 comunicacoes
+voltar a p�r os byebyes
+logout

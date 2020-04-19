@@ -10,9 +10,6 @@ namespace ChatClient
 {
     public partial class MainWindow : Form
     {
-
-        private static MainWindow mInst;
-
         // server + port
         IServerObj server;
         public string username;
@@ -25,8 +22,7 @@ namespace ChatClient
 
         // other variables
         List<UserSession> activeSessions;
-        public List<IChatWindow> activeConversationWindows;
-        //public List<GroupConversationWindow> activeGroupConversationWindows;
+        public List<ConversationWindow> activeConversationWindows;
         RemMessage remMessage;
 
         public MainWindow(IServerObj server, string username, string port)
@@ -37,9 +33,8 @@ namespace ChatClient
             this.server = server;
             this.username = username;
             this.port = port;
-            
-            activeConversationWindows = new List<IChatWindow>();
-            //activeGroupConversationWindows = new List<GroupConversationWindow>();
+
+            activeConversationWindows = new List<ConversationWindow>();
 
             //  Sessions list settings
             activeSessionsList.View = View.Details;
@@ -55,20 +50,6 @@ namespace ChatClient
             PlaceActiveSessions();
             AlterEventRepeaterSection();
             SetupCommunication();
-        }
-        public static MainWindow CheckInst
-        {
-            get
-            {
-                return mInst;
-            }
-        }
-
-        public static MainWindow CreateInst(IServerObj server, string username, string port)
-        {
-            if (mInst == null)
-                mInst = new MainWindow(server, username, port);
-            return mInst;
         }
 
         private void PlaceActiveSessions()
@@ -97,7 +78,7 @@ namespace ChatClient
             remMessage = (RemMessage)RemotingServices.Connect(typeof(RemMessage), url);
             remMessage.PutMyForm(this);
         }
-        
+
 
 
         public void DoAlterations(Operation op, string username, string port)
@@ -113,13 +94,13 @@ namespace ChatClient
                     activeSessions.Add(newUserSession);
                     lvAdd = new LVAddDelegate(activeSessionsList.Items.Add);
                     ListViewItem lvItem = new ListViewItem(new string[] { username });
-                    // Checkar esta parte
                     BeginInvoke(lvAdd, new object[] { lvItem });
-                    //lvAdd.Invoke(lvItem);       // como o stor tem
                     break;
 
                 case Operation.SessionEnd:
-                    Console.WriteLine("DoAlterations for Operation.SessionEnd");
+
+                    lvRem = new LVRemDelegate(RemoveLoggedOutUser);
+                    BeginInvoke(lvRem, new object[] { username });
                     break;
 
                 default:
@@ -127,81 +108,71 @@ namespace ChatClient
             }
         }
 
+        private void RemoveLoggedOutUser(string loggedOutUsername)
+        {
+            foreach (ListViewItem item in activeSessionsList.Items)
+            {
+                if (item.SubItems[0].Text.Equals(loggedOutUsername))
+                {
+                    item.Remove();
+                    break;
+                }
+            }
+
+            for (int i = 0; i < activeSessions.Count; i++)
+            {
+                if (activeSessions[i].username.Equals(loggedOutUsername))
+                {
+                    activeSessions.RemoveAt(i);
+                    break;
+                }
+            }
+
+            for (int i = 0; i < activeConversationWindows.Count; i++)
+            {
+                if (activeConversationWindows[i].GetOtherUsernames().Contains(loggedOutUsername))
+                {
+                    activeConversationWindows[i].LeaveConversation();
+                    activeConversationWindows.RemoveAt(i);
+                    i = 0;
+                }
+            }
+        }
+
         private void start_conversation_Click(object sender, EventArgs e)
         {
-            if(activeSessionsList.SelectedItems.Count == 0)
+            if (activeSessionsList.SelectedItems.Count == 0)
             {
-                MessageBox.Show("Please choose a user to chat with.");
+                MessageBox.Show("Please choose at least one user to chat with.");
                 return;
-            }
-            else if(activeSessionsList.SelectedItems.Count == 1)
-            {
-                string selectedUsername = activeSessionsList.SelectedItems[0].Text;
-                SendProposal(selectedUsername);
-                
-                // LATER ALLIGATOR
-                //string selectedUsername = activeSessionsList.SelectedItems[0].Text;
-                //ConversationWindow newConversationWindow = new ConversationWindow(server, username, port, selectedUsername);
-                //activeConversationWindows.Add(newConversationWindow);
-                //newConversationWindow.Show();
             }
             else
             {
-                List<string> selectedUsernames = new List<string>();
+                List<string> selectUsernames = new List<string>();
                 foreach (ListViewItem selectedUsername in activeSessionsList.SelectedItems)
                 {
-                    selectedUsernames.Add(selectedUsername.Text);
+                    selectUsernames.Add(selectedUsername.Text);
                 }
-                SendGroupProposal(selectedUsernames);
+                SendProposal(selectUsernames);
             }
         }
 
-        private void SendGroupProposal(List<string> proposalReceiverUsernames)
+        private void SendProposal(List<string> proposalReceiverUsernames)
         {
+            ConversationProposal conversationProposal = new ConversationProposal(server, username, proposalReceiverUsernames);
             new Thread(() =>
             {
-                server.SendGroupProposal(username, proposalReceiverUsernames);
+                conversationProposal.SendConversationProposal();
             }).Start();
         }
 
-        private void SendProposal(string proposalReceiverUsername)
+        public void ReceiveProposal(string proposalSenderUsername, List<string> proposalReceiverUsernames)
         {
-            ConversationProposal conversationProposal = new ConversationProposal(server, username, proposalReceiverUsername);
-            new Thread(() =>
-            {
-                conversationProposal.SendProposal();
-            }).Start();
-        }
-
-        public void ReceiveGroupProposal(string proposalSenderUsername, List<string> porposalReceiverUsernames)
-        {
-            string others = "";
-            foreach(string other in porposalReceiverUsernames)
-            {
-                if(other != username)
-                {
-                    others += (other + ", ");
-                }
-            }
-            others = others.Remove(others.Length - 2, 2);
-
-            string message = proposalSenderUsername + " is proposing a group conversation with " + others + ". Do you also want to chat with him/her?";
-            string caption = "Conversation Group Proposal";
+            string message = BuildConversationProposalMessage(proposalSenderUsername, proposalReceiverUsernames);
+            string caption = "Conversation Proposal";
             DialogResult proposalResult = MessageBox.Show(message, caption, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
             if (proposalResult == DialogResult.Yes)       // If the proposal receiver answers Yes
-                server.YesToGroupProposal(proposalSenderUsername, username);
-            else                                         // If the proposal receiver answers No
-                server.NoToProposal(proposalSenderUsername, username);
-        }
-
-        public void ReceiveProposal(string proposalSenderUsername)
-        {
-            string message = proposalSenderUsername + " is proposing a conversation. Do you also want to chat with him/her?";
-            string caption = "Conversation Proposal";
-            DialogResult proposalResult = MessageBox.Show(message, caption, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-            
-            if(proposalResult == DialogResult.Yes)       // If the proposal receiver answers Yes
                 server.YesToProposal(proposalSenderUsername, username);
             else                                         // If the proposal receiver answers No
                 server.NoToProposal(proposalSenderUsername, username);
@@ -220,49 +191,59 @@ namespace ChatClient
             }
         }
 
-        public void ReceiveYesToProposal(string proposalReceiverUsername, string proposalReceiverAddress, string chatID, ChatModel chatmodel)
-        {
-            ConversationWindow chatwindow = new ConversationWindow(chatID, this, server, username, proposalReceiverAddress, proposalReceiverUsername, chatmodel);
-            activeConversationWindows.Add(chatwindow);
-            OpenConversation(chatwindow);
-
-            // Mensagem a dizer que o outro dude aceitou
-
-        }
-
-        internal void StartGroupChat(List<string> usernames, List<string> addresses, string chatID, ChatModel chatmodel)
+        public void StartChat(string chatName, List<string> usernames, List<string> addresses, List<MessageModel> previousMessages)
         {
             for (int i = 0; i < usernames.Count; i++)
             {
-                if (usernames[i] == username)
+                if (usernames[i].Equals(username))
                 {
                     usernames.RemoveAt(i);
                     addresses.RemoveAt(i);
+                    break;
                 }
             }
-            GroupConversationWindow chatwindow = new GroupConversationWindow(chatID, this, server, username, addresses, usernames, chatmodel);
-            activeConversationWindows.Add(chatwindow);
-            OpenConversation(chatwindow);
+
+            ConversationWindow conversationWindow = new ConversationWindow(this, server, chatName, username, usernames, addresses, previousMessages);
+            activeConversationWindows.Add(conversationWindow);
+            OpenConversation(conversationWindow);
         }
 
-        public void ReceiveNoToProposal(string proposalReceiverUsername)
+
+        // Builds the proposal message for both simple and group chats
+        private string BuildConversationProposalMessage(string proposalSenderUsername, List<string> proposalReceiverUsernames)
         {
-            MessageBox.Show("User " + proposalReceiverUsername + " has declined your conversation.");
-            return;
+            string message = "";
+            if (proposalReceiverUsernames.Count == 1)
+            {
+                message = proposalSenderUsername + " is proposing a conversation. Do you also want to chat with him/her?";
+            }
+            else
+            {
+                string others = "";
+                foreach (string proposalReceiverUsername in proposalReceiverUsernames)
+                {
+                    if (proposalReceiverUsername != username)
+                    {
+                        others += (proposalReceiverUsername + ", ");
+                    }
+                }
+                others = others.Remove(others.Length - 2, 2);
+                message = proposalSenderUsername + " is proposing a group conversation with " + others + ". Do you also want to chat with him/her?";
+            }
+
+            return message;
         }
 
-        public void StartAcceptedProposal(string proposalSenderUsername, string proposalSenderAddress, string chatID, ChatModel chatmodel)
-        {   
-            ConversationWindow chatwindow = new ConversationWindow(chatID, this, server, username, proposalSenderAddress, proposalSenderUsername, chatmodel);
-            activeConversationWindows.Add(chatwindow);
-            OpenConversation(chatwindow);
-            // Mensagem a dizer que ja vai começar a conversa
-        }
-
-        private void MainWindow_Load(object sender, EventArgs e)
+        private void logout_button_Click(object sender, EventArgs e)
         {
-            IsMdiContainer = true;
+            this.Close();
+        }
 
+        private void MainWindow_FormClosing(Object sender, FormClosingEventArgs e)
+        {
+            server.alterEvent -= new AlterDelegate(evRepeater.Repeater);
+            evRepeater.alterEvent -= new AlterDelegate(DoAlterations);
+            server.Logout(username);
         }
     }
 
@@ -281,58 +262,32 @@ namespace ChatClient
             win = form;
         }
 
-        public void ReceiveGroupProposal(string proposalSenderUsername, List<string> porposalReceiverUsernames)
+        public void ReceiveProposal(string proposalSenderUsername, List<string> proposalReceiverUsernames)
         {
-            win.ReceiveGroupProposal(proposalSenderUsername, porposalReceiverUsernames);
+            win.ReceiveProposal(proposalSenderUsername, proposalReceiverUsernames);
         }
 
-        public void ReceiveProposal(string proposalSenderUsername)
+        public void StartChat(string chatName, List<string> usernames, List<string> addresses, List<MessageModel> previousMessages)
         {
-            win.ReceiveProposal(proposalSenderUsername);
+            win.StartChat(chatName, usernames, addresses, previousMessages);
         }
 
-        public void ReceiveYesToProposal(string proposalReceiverUsername, string proposalReceiverAddress, string chatID, ChatModel chatmodel)
+        public void ReceiveMessage(string chatName, string username, string messageText, string messageTime, bool isPrivate)
         {
-            win.ReceiveYesToProposal(proposalReceiverUsername, proposalReceiverAddress, chatID, chatmodel);
-        }
-        
-        public void StartGroupChat(List<string> usernames, List<string> addresses, string chatID, ChatModel chatmodel)
-        {
-            win.StartGroupChat(usernames, addresses, chatID, chatmodel);
+            ConversationWindow window = win.activeConversationWindows.Find(windoww => windoww.GetChatName() == chatName);
+            window.WriteReceivedMessage(username, messageText, messageTime, isPrivate);
         }
 
-        public void ReceiveNoToProposal(string proposalReceiverUsername)
+        public void LeaveConversation(string chatName)
         {
-            win.ReceiveNoToProposal(proposalReceiverUsername);
+            ConversationWindow window = win.activeConversationWindows.Find(windoww => windoww.GetChatName() == chatName);
+            window.LeaveConversation();
         }
 
-        public void StartAcceptedProposal(string proposalSenderUsername, string proposalSenderAddress, string chatID, ChatModel chatmodel)
+        public void ReceiveFile(string chatName, byte[] file, string extension, string v1, string username, bool v2)
         {
-            win.StartAcceptedProposal(proposalSenderUsername, proposalSenderAddress, chatID, chatmodel);
-        }
-
-        public string test(string test)
-        {
-            Console.WriteLine("received " + test);
-            return "Hi. I received your " + test;
-        }
-
-        public void receiveMessage(string chatID, string message, string time, string senderUsername, bool isPrivate)
-        {
-            IChatWindow window = win.activeConversationWindows.Find(windoww => windoww.getID() == chatID);
-            window.writeReceivedMessage(message, time, senderUsername, isPrivate);
-        }
-
-        public void ByeBye(string chatID)
-        {
-            IChatWindow window = win.activeConversationWindows.Find(windoww => windoww.getID() == chatID);
-            window.userByebyed();
-        }
-
-        public void receiveFile(string chatID, byte[] file, string extension, string v1, string username, bool v2)
-        {
-            IChatWindow window = win.activeConversationWindows.Find(windoww => windoww.getID() == chatID);
-            window.receiveFile(file, extension);
+            ConversationWindow window = win.activeConversationWindows.Find(windoww => windoww.GetChatName() == chatName);
+            window.ReceiveFile(file, extension);
         }
     }
 }

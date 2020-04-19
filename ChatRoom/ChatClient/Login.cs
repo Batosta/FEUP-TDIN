@@ -41,9 +41,6 @@ namespace ChatClient
                 this.Hide();
                 MainWindow mainWindow = new MainWindow(server, username_box.Text, port);
                 mainWindow.Show();
-                //MainWindow.CreateInst(server, username_box.Text, port);
-                //Console.WriteLine("test username: " + MainWindow.CheckInst.username);
-                //MainWindow.CheckInst.Show();
             }
             else if(loginResult == 2)
             {
