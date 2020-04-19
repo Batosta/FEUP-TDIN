@@ -14,4 +14,5 @@ public interface IClientObj
 
     void LeaveConversation(string chatName);
     void ReceiveFile(string chatName, string username, byte[] fileToSend, string extension, string messageTime);
+    void SetupConnection();
 }

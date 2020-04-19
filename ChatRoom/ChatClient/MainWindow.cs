@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SharpCompress.Common;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -22,7 +23,7 @@ namespace ChatClient
 
         // other variables
         List<UserSession> activeSessions;
-        public List<ConversationWindow> activeConversationWindows;
+        public Dictionary<string, ConversationWindow> activeConversationWindows;
         RemMessage remMessage;
 
         public MainWindow(IServerObj server, string username, string port)
@@ -34,7 +35,7 @@ namespace ChatClient
             this.username = username;
             this.port = port;
 
-            activeConversationWindows = new List<ConversationWindow>();
+            activeConversationWindows = new Dictionary<string, ConversationWindow>();
 
             //  Sessions list settings
             activeSessionsList.View = View.Details;
@@ -94,7 +95,7 @@ namespace ChatClient
                     activeSessions.Add(newUserSession);
                     lvAdd = new LVAddDelegate(activeSessionsList.Items.Add);
                     ListViewItem lvItem = new ListViewItem(new string[] { username });
-                    BeginInvoke(lvAdd, new object[] { lvItem });
+                        BeginInvoke(lvAdd, new object[] { lvItem });
                     break;
 
                 case Operation.SessionEnd:
@@ -127,16 +128,31 @@ namespace ChatClient
                     break;
                 }
             }
-
+            List<string> conversationsToLeave = new List<string>();
+            foreach (KeyValuePair<string, ConversationWindow> entry in activeConversationWindows)
+            {
+                if (entry.Value.GetOtherUsernames().Contains(loggedOutUsername))
+                {
+                    conversationsToLeave.Add(entry.Key);
+                    //activeConversationWindows.Remove(activeConversationWindows.ElementAt(i).Key);
+                }
+            }
+            
+            foreach ( string conversationToLeave in conversationsToLeave)
+            {
+                activeConversationWindows[conversationToLeave].LeaveConversation();
+            }
+            /*
             for (int i = 0; i < activeConversationWindows.Count; i++)
             {
-                if (activeConversationWindows[i].GetOtherUsernames().Contains(loggedOutUsername))
+                if (activeConversationWindows.ElementAt(i).Value.GetOtherUsernames().Contains(loggedOutUsername))
                 {
-                    activeConversationWindows[i].LeaveConversation();
-                    activeConversationWindows.RemoveAt(i);
+                    activeConversationWindows.ElementAt(i).Value.LeaveConversation();
+                    //activeConversationWindows.Remove(activeConversationWindows.ElementAt(i).Key);
                     i = 0;
                 }
             }
+            */
         }
 
         private void start_conversation_Click(object sender, EventArgs e)
@@ -148,12 +164,17 @@ namespace ChatClient
             }
             else
             {
+                string chatname = username;
                 List<string> selectUsernames = new List<string>();
                 foreach (ListViewItem selectedUsername in activeSessionsList.SelectedItems)
                 {
+                    chatname += selectedUsername.Text;
                     selectUsernames.Add(selectedUsername.Text);
                 }
-                SendProposal(selectUsernames);
+                if (!activeConversationWindows.ContainsKey(String.Concat(chatname.OrderBy(c => c))))
+                    SendProposal(selectUsernames);
+                else
+                    MessageBox.Show("You area already chatting with this user(s)");
             }
         }
 
@@ -191,7 +212,7 @@ namespace ChatClient
             }
 
             ConversationWindow conversationWindow = new ConversationWindow(this, server, chatName, username, usernames, addresses, previousMessages);
-            activeConversationWindows.Add(conversationWindow);
+            activeConversationWindows[chatName] = conversationWindow;
             this.Invoke((MethodInvoker)delegate
             {
                 conversationWindow.Show();
@@ -231,9 +252,29 @@ namespace ChatClient
 
         private void MainWindow_FormClosing(Object sender, FormClosingEventArgs e)
         {
+            List<string> conversationsToLeave = new List<string>();
+            foreach (KeyValuePair<string, ConversationWindow> entry in activeConversationWindows)
+            {
+                conversationsToLeave.Add(entry.Key);
+            }
+
+            foreach (string conversationToLeave in conversationsToLeave)
+            {
+                activeConversationWindows[conversationToLeave].LeaveConversation();
+            }
             server.alterEvent -= new AlterDelegate(evRepeater.Repeater);
             evRepeater.alterEvent -= new AlterDelegate(DoAlterations);
             server.Logout(username);
+            if (System.Windows.Forms.Application.MessageLoop)
+            {
+                // WinForms app
+                System.Windows.Forms.Application.Exit();
+            }
+            else
+            {
+                // Console app
+                System.Environment.Exit(1);
+            }
         }
 
         private void help_button_Click(object sender, EventArgs e)
@@ -270,20 +311,21 @@ namespace ChatClient
 
         public void ReceiveMessage(string chatName, string username, string messageText, string messageTime, bool isPrivate)
         {
-            ConversationWindow window = win.activeConversationWindows.Find(windoww => windoww.GetChatName() == chatName);
-            window.WriteReceivedMessage(username, messageText, messageTime, isPrivate);
+            win.activeConversationWindows[chatName].WriteReceivedMessage(username, messageText, messageTime, isPrivate);
         }
 
         public void LeaveConversation(string chatName)
         {
-            ConversationWindow window = win.activeConversationWindows.Find(windoww => windoww.GetChatName() == chatName);
-            window.LeaveConversation();
+            win.activeConversationWindows[chatName].LeaveConversation();
         }
 
         public void ReceiveFile(string chatName, string username, byte[] file, string extension, string messageTime)
         {
-            ConversationWindow window = win.activeConversationWindows.Find(windoww => windoww.GetChatName() == chatName);
-            window.ReceiveFile(username, file, extension, messageTime);
+            win.activeConversationWindows[chatName].ReceiveFile(username, file, extension, messageTime);
+        }
+
+        public void SetupConnection()
+        {
         }
     }
 }

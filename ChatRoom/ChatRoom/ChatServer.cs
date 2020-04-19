@@ -51,7 +51,7 @@ public class ServerObj : MarshalByRefObject, IServerObj
         {
             if (PasswordHandler.Validate(password, user.Password))
             {
-                if (!activeSessions.Contains(new UserSession(username, port)))
+                if (!UserIsActive(username))
                     return 1;
                 else
                     return 2;
@@ -63,6 +63,16 @@ public class ServerObj : MarshalByRefObject, IServerObj
             return 4;
     }
 
+    private bool UserIsActive(string username)
+    {
+        foreach (UserSession session in activeSessions)
+        {
+            if (session.username.Equals(username))
+                return true;
+        }
+        return false;
+    }
+
     public void PerformLogin(string username, string port)
     {
         string address = "tcp://localhost:" + port + "/Message";
@@ -71,6 +81,7 @@ public class ServerObj : MarshalByRefObject, IServerObj
         activeSessions.Add(newUserSession);
 
         NotifyClients(Operation.SessionStart, username, port);
+        Console.WriteLine("User logged in: " + username + " in port: " + port);
     }
 
     public int Register(string username, string realName, string password)
@@ -95,6 +106,7 @@ public class ServerObj : MarshalByRefObject, IServerObj
             Password = HashPassword(password)
         };
         collection.InsertOne(newUserModel);
+        Console.WriteLine("User registered: " + username);
         return 1;
     }
 
@@ -109,6 +121,7 @@ public class ServerObj : MarshalByRefObject, IServerObj
             }
         }
         NotifyClients(Operation.SessionEnd, username, null);
+        Console.WriteLine("User logged out: " + username);
     }
 
 
@@ -134,6 +147,7 @@ public class ServerObj : MarshalByRefObject, IServerObj
 
     public void YesToProposal(string proposalSenderUsername, string proposalReceiverUsername)
     {
+        Console.WriteLine("Yes received from " + proposalReceiverUsername);
         List<string> usernames = new List<string>();
         List<string> addresses = new List<string>();
         string proposalSenderAddress = GetUserAddress(proposalSenderUsername);
@@ -149,7 +163,7 @@ public class ServerObj : MarshalByRefObject, IServerObj
             usernames.Add(entry.Key);
             addresses.Add(GetUserAddress(entry.Key));
         }
-
+        Console.WriteLine("All users accepted " + proposalSenderUsername + "'s proposal.");
         // If reaches this code, all receivers have already accepted the conversation
         IClientObj clientObjSender = (IClientObj)RemotingServices.Connect(typeof(IClientObj), (string)proposalSenderAddress);
 
@@ -167,10 +181,16 @@ public class ServerObj : MarshalByRefObject, IServerObj
         foreach(KeyValuePair<string, bool> entry in conversationProposals[proposalSenderUsername])
         {
             string proposalReceiverAddress = GetUserAddress(entry.Key);
-            IClientObj clientObjReceiver = (IClientObj)RemotingServices.Connect(typeof(IClientObj), (string)proposalReceiverAddress);
-            clientObjReceiver.StartChat(chatName, usernames, addresses, previousMessages);
+            new Thread(() => {
+                IClientObj clientObjReceiver = (IClientObj)RemotingServices.Connect(typeof(IClientObj), (string)proposalReceiverAddress);
+                Console.WriteLine("Telling " + entry.Key + " to start chat.");
+                clientObjReceiver.StartChat(chatName, usernames, addresses, previousMessages);
+            }).Start();
         }
-        clientObjSender.StartChat(chatName, usernames, addresses, previousMessages);
+        new Thread(() => { 
+                Console.WriteLine("Telling " + proposalSenderUsername + " to start chat.");
+                clientObjSender.StartChat(chatName, usernames, addresses, previousMessages); 
+        }).Start();
     }
     public void NoToProposal(string proposalSenderUsername, string proposalReceiverUsername)
     {
