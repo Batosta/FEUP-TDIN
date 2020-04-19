@@ -46,7 +46,7 @@
             this.message_viewer.TabIndex = 0;
             this.message_viewer.TileSize = new System.Drawing.Size(1, 30);
             this.message_viewer.UseCompatibleStateImageBehavior = false;
-            this.message_viewer.View = System.Windows.Forms.View.Details;
+            this.message_viewer.View = System.Windows.Forms.View.SmallIcon;
             // 
             // msg_text_box
             // 

@@ -4,6 +4,7 @@ using System.IO;
 using System.Runtime.Remoting;
 using System.Threading;
 using System.Windows.Forms;
+using System.Drawing;
 
 namespace ChatClient
 {
@@ -17,6 +18,7 @@ namespace ChatClient
         readonly List<string> otherUsernames;
         readonly List<string> otherUsersAddresses;
         Dictionary<string, IClientObj> otherClients = new Dictionary<string, IClientObj>();
+        int[] colors = { 10079487, 13434828, 16764108 };
 
         bool userLeft = false;
 
@@ -29,7 +31,6 @@ namespace ChatClient
             this.server = server;
             this.chatName = chatName;
             this.username = username;
-            this.AcceptButton = send_message_button;
             this.otherUsernames = otherUsernames;
             this.otherUsersAddresses = otherUsersAddresses;
 
@@ -66,7 +67,7 @@ namespace ChatClient
             string name = CheckPrivate(messageText);
             if (name == "/public")    //  not private
             {
-                message_viewer.Items.Add("Me: " + messageText + " - " + messageTime);
+                message_viewer.Items.Add("Me: " + messageText + " - " + messageTime).BackColor = Color.FromArgb(colors[0]); ;
                 foreach (KeyValuePair<string, IClientObj> entry in otherClients)
                 {
                     entry.Value.ReceiveMessage(chatName, username, messageText, messageTime, false);
@@ -82,7 +83,7 @@ namespace ChatClient
                     receivers.Add(name);
                     server.StoreMessage(chatName, username, messageText, messageTime, true, otherUsernames);
                     otherClients[name].ReceiveMessage(chatName, username, messageText, messageTime, true);
-                    message_viewer.Items.Add("Me to " + name + ": " + messageText + " - " + messageTime);
+                    message_viewer.Items.Add("Me to " + name + ": " + messageText + " - " + messageTime).BackColor = Color.FromArgb(colors[1]);
                 }
             }
 
@@ -124,15 +125,19 @@ namespace ChatClient
             if (isPrivate)
             {
                 messageToBeDisplay += "(pm) " + username + ": " + messageText + " - " + messageTime;
+                mainWindow.Invoke((MethodInvoker)delegate
+                {
+                    message_viewer.Items.Add(messageToBeDisplay).BackColor = Color.FromArgb(colors[1]);
+                });
             }
             else
             {
                 messageToBeDisplay += username + ": " + messageText + " - " + messageTime;
+                mainWindow.Invoke((MethodInvoker)delegate
+                {
+                    message_viewer.Items.Add(messageToBeDisplay).BackColor = Color.FromArgb(colors[2]);
+                });
             }
-            mainWindow.Invoke((MethodInvoker)delegate
-            {
-                message_viewer.Items.Add(messageToBeDisplay);
-            });
         }
 
         public string GetChatName()
@@ -163,21 +168,28 @@ namespace ChatClient
                         message = "(pm) " + previousMessage.Sender + ": " + previousMessage.Text + " - " + previousMessage.Time;
                     else if (previousMessage.Sender == username)
                         message = "Me to " + previousMessage.Receivers[0] + ": " + previousMessage.Text + " - " + previousMessage.Time;
+
+                    message_viewer.Items.Add(message).BackColor = Color.FromArgb(colors[1]);
                 }
                 else
                 {
                     if (previousMessage.Sender.Equals(username))
+                    {
                         message = "Me: " + previousMessage.Text + " - " + previousMessage.Time;
+                        message_viewer.Items.Add(message).BackColor = Color.FromArgb(colors[0]);
+                    }
                     else
+                    {
                         message = previousMessage.Sender + ": " + previousMessage.Text + " - " + previousMessage.Time;
+                        message_viewer.Items.Add(message).BackColor = Color.FromArgb(colors[2]);
+                    }
                 }
-                message_viewer.Items.Add(message);
             }
         }
 
         private void SetupMessageViewer()
         {
-            message_viewer.View = View.Details;
+            message_viewer.View = View.SmallIcon;
             ColumnHeader header = new ColumnHeader();
             message_viewer.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
             header.Text = "";

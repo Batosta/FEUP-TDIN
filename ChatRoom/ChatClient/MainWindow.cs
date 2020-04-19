@@ -235,6 +235,12 @@ namespace ChatClient
             evRepeater.alterEvent -= new AlterDelegate(DoAlterations);
             server.Logout(username);
         }
+
+        private void help_button_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Select the user you want to chat with and then press the Start Conversation button." +
+                " If you pretend to have a group chat, select more than 1 user before clicking the Start Conversation.");
+        }
     }
 
 
