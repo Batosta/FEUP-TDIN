@@ -5,6 +5,8 @@ checkar o que acontece quando alguem nao aceita
 melhorar a cena dos ficheiros (por as mostrar as imagens no chat?)
 Alterar de port para address + port
 
+form closing para login e register, fazer exit da aplicaçao como está no MainWindow
+
 RELATORIO
 
 
