@@ -238,6 +238,7 @@ namespace ChatClient
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 fileToSend = File.ReadAllBytes(openFileDialog1.FileName);
+                string filename = Path.GetFileName(openFileDialog1.FileName);
                 string messageTime = DateTime.Now.ToString("%h:%m:%s");
 
                 foreach (KeyValuePair<string, IClientObj> entry in otherClients)
@@ -247,7 +248,7 @@ namespace ChatClient
                         entry.Value.ReceiveFile(chatName,
                                             username,
                                             fileToSend,
-                                            openFileDialog1.FileName,
+                                            filename,
                                             messageTime);
                     }).Start();
                 }
