@@ -1,10 +1,10 @@
 TODO:
 checkar se o user ja nao esta loggado
-ui
-voltar a p�r as private msgs
+UI (selects, mudar mensagens para labels (maybe))
 checkar o que acontece quando alguem nao aceita
-login com enter (nao importante)
-meter ficheiros (nao importante)
+melhorar a cena dos ficheiros (por as mostrar as imagens no chat?)
+Alterar de port para address + port
+Remover openconversation para delegate anonimo (como ta na convesation window no invoke)
 
 RELATORIO
 
@@ -12,8 +12,11 @@ RELATORIO
 
 
 DONE:
+login com enter (nao importante)
+meter ficheiros (nao importante)
+voltar a por as private msgs
 uniformizar as proposals
 nos groupchats remover as msgs proprias duplicadas
 tentar juntar as 2 comunicacoes
-voltar a p�r os byebyes
+voltar a por os byebyes
 logout
