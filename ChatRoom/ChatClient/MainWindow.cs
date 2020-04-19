@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SharpCompress.Common;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -94,7 +95,7 @@ namespace ChatClient
                     activeSessions.Add(newUserSession);
                     lvAdd = new LVAddDelegate(activeSessionsList.Items.Add);
                     ListViewItem lvItem = new ListViewItem(new string[] { username });
-                    BeginInvoke(lvAdd, new object[] { lvItem });
+                        BeginInvoke(lvAdd, new object[] { lvItem });
                     break;
 
                 case Operation.SessionEnd:
@@ -127,16 +128,31 @@ namespace ChatClient
                     break;
                 }
             }
-
+            List<string> conversationsToLeave = new List<string>();
+            foreach (KeyValuePair<string, ConversationWindow> entry in activeConversationWindows)
+            {
+                if (entry.Value.GetOtherUsernames().Contains(loggedOutUsername))
+                {
+                    conversationsToLeave.Add(entry.Key);
+                    //activeConversationWindows.Remove(activeConversationWindows.ElementAt(i).Key);
+                }
+            }
+            
+            foreach ( string conversationToLeave in conversationsToLeave)
+            {
+                activeConversationWindows[conversationToLeave].LeaveConversation();
+            }
+            /*
             for (int i = 0; i < activeConversationWindows.Count; i++)
             {
                 if (activeConversationWindows.ElementAt(i).Value.GetOtherUsernames().Contains(loggedOutUsername))
                 {
                     activeConversationWindows.ElementAt(i).Value.LeaveConversation();
-                    activeConversationWindows.Remove(activeConversationWindows.ElementAt(i).Key);
+                    //activeConversationWindows.Remove(activeConversationWindows.ElementAt(i).Key);
                     i = 0;
                 }
             }
+            */
         }
 
         private void start_conversation_Click(object sender, EventArgs e)
@@ -236,6 +252,16 @@ namespace ChatClient
 
         private void MainWindow_FormClosing(Object sender, FormClosingEventArgs e)
         {
+            List<string> conversationsToLeave = new List<string>();
+            foreach (KeyValuePair<string, ConversationWindow> entry in activeConversationWindows)
+            {
+                conversationsToLeave.Add(entry.Key);
+            }
+
+            foreach (string conversationToLeave in conversationsToLeave)
+            {
+                activeConversationWindows[conversationToLeave].LeaveConversation();
+            }
             server.alterEvent -= new AlterDelegate(evRepeater.Repeater);
             evRepeater.alterEvent -= new AlterDelegate(DoAlterations);
             server.Logout(username);
