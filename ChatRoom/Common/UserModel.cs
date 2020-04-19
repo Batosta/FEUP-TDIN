@@ -10,5 +10,4 @@ public class UserModel
     public string RealName { get; set; }
 
     public string Password { get; set; }
-    public List<string> ChatIDs { get; set; }
 }

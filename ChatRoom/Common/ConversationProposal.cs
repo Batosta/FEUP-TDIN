@@ -6,17 +6,17 @@ public class ConversationProposal
 {
     IServerObj server;
     readonly string proposalSenderUsername;
-    readonly string proposalReceiverUsername;
+    readonly List<string> proposalReceiverUsernames;
 
-    public ConversationProposal(IServerObj server, string proposalSenderUsername, string proposalReceiverUsername)
+    public ConversationProposal(IServerObj server, string proposalSenderUsername, List<string> proposalReceiverUsername)
     {
         this.server = server;
         this.proposalSenderUsername = proposalSenderUsername;
-        this.proposalReceiverUsername = proposalReceiverUsername;
+        this.proposalReceiverUsernames = proposalReceiverUsername;
     }
 
-    public void SendProposal()
+    public void SendConversationProposal()
     {
-        server.SendProposal(proposalSenderUsername, proposalReceiverUsername);
+        server.SendConversationProposal(proposalSenderUsername, proposalReceiverUsernames);
     }
 }

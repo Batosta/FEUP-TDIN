@@ -93,7 +93,6 @@
     <Compile Include="GroupConversationWindow.Designer.cs">
       <DependentUpon>GroupConversationWindow.cs</DependentUpon>
     </Compile>
-    <Compile Include="IChatWindow.cs" />
     <Compile Include="Login.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -35,7 +35,6 @@ namespace ChatClient
             Login login = new Login(port.ToString());
 
             Application.EnableVisualStyles();
-            //Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(login);
         }
     }

@@ -12,21 +12,26 @@ public interface IServerObj
      * Login + Register methods
      */
     int Login(string username, string password, string port);
+    
     void PerformLogin(string username, string port);
+    
     int Register(string username, string realName, string password);
 
 
     /*
      * Conversation Initiation methods
      */
-    void SendProposal(string proposalSenderUsername, string proposalReceiverUsername);
-    void YesToProposal(string proposalSenderUsername, string proposalReceiverUsername);
-    void NoToProposal(string proposalSenderUsername, string proposalReceiverUsername);
-    void SendGroupProposal(string proposalSenderUsername, List<string> proposalReceiverUsernames);
-    void YesToGroupProposal(string proposalSenderUsername, string proposalReceiverUsername);
-    void NoToGroupProposal(string proposalSenderUsername, string proposalReceiverUsername);
+    void SendConversationProposal(string proposalSenderUsername, List<string> proposalReceiverUsernames);
 
-    void storeMessage(MessageModel message);
+    void YesToProposal(string proposalSenderUsername, string proposalReceiverUsername);
+
+    void NoToProposal(string proposalSenderUsername, string proposalReceiverUsername);
+
+
+    /*
+     * Other methods
+     */
+    void StoreMessage(string chatName, string username, string messageText, string messageTime, List<string> otherUsernames);
 
     List<UserSession> GetActiveSessions();
 }

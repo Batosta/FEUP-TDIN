@@ -72,7 +72,6 @@
             this.Controls.Add(this.label1);
             this.Name = "MainWindow";
             this.Text = "MainWindow";
-            this.Load += new System.EventHandler(this.MainWindow_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
