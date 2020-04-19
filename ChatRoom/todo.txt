@@ -1,10 +1,10 @@
 TODO:
-logout
 checkar se o user ja nao esta loggado
 ui
-login com enter
-voltar a pôr as private msgs
+voltar a pï¿½r as private msgs
 checkar o que acontece quando alguem nao aceita
+login com enter (nao importante)
+meter ficheiros (nao importante)
 
 RELATORIO
 
@@ -15,4 +15,5 @@ DONE:
 uniformizar as proposals
 nos groupchats remover as msgs proprias duplicadas
 tentar juntar as 2 comunicacoes
-voltar a pôr os byebyes
+voltar a pï¿½r os byebyes
+logout

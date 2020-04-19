@@ -31,6 +31,7 @@
             this.activeSessionsList = new System.Windows.Forms.ListView();
             this.label1 = new System.Windows.Forms.Label();
             this.start_conversation = new System.Windows.Forms.Button();
+            this.logout_button = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // activeSessionsList
@@ -62,11 +63,22 @@
             this.start_conversation.UseVisualStyleBackColor = true;
             this.start_conversation.Click += new System.EventHandler(this.start_conversation_Click);
             // 
+            // logout_button
+            // 
+            this.logout_button.Location = new System.Drawing.Point(362, 12);
+            this.logout_button.Name = "logout_button";
+            this.logout_button.Size = new System.Drawing.Size(122, 29);
+            this.logout_button.TabIndex = 6;
+            this.logout_button.Text = "Logout";
+            this.logout_button.UseVisualStyleBackColor = true;
+            this.logout_button.Click += new System.EventHandler(this.logout_button_Click);
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(496, 394);
+            this.Controls.Add(this.logout_button);
             this.Controls.Add(this.start_conversation);
             this.Controls.Add(this.activeSessionsList);
             this.Controls.Add(this.label1);
@@ -82,5 +94,6 @@
         private System.Windows.Forms.ListView activeSessionsList;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button start_conversation;
+        private System.Windows.Forms.Button logout_button;
     }
 }

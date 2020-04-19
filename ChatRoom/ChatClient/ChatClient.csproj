@@ -87,12 +87,6 @@
     <Compile Include="ConversationWindow.Designer.cs">
       <DependentUpon>ConversationWindow.cs</DependentUpon>
     </Compile>
-    <Compile Include="GroupConversationWindow.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GroupConversationWindow.Designer.cs">
-      <DependentUpon>GroupConversationWindow.cs</DependentUpon>
-    </Compile>
     <Compile Include="Login.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -115,9 +109,6 @@
     </Compile>
     <EmbeddedResource Include="ConversationWindow.resx">
       <DependentUpon>ConversationWindow.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GroupConversationWindow.resx">
-      <DependentUpon>GroupConversationWindow.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Login.resx">
       <DependentUpon>Login.cs</DependentUpon>

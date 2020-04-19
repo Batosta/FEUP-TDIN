@@ -9,13 +9,15 @@ public interface IServerObj
     event AlterDelegate alterEvent;
 
     /*
-     * Login + Register methods
+     * Login + Logout + Register methods
      */
     int Login(string username, string password, string port);
     
     void PerformLogin(string username, string port);
     
     int Register(string username, string realName, string password);
+
+    void Logout(string username);
 
 
     /*

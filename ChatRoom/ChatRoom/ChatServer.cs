@@ -32,7 +32,7 @@ public class ServerObj : MarshalByRefObject, IServerObj
 
 
     /*
-     * Login + Register methods
+     * Login + Logout + Register methods
      */
     public int Login(string username, string password, string port)
     {
@@ -96,6 +96,19 @@ public class ServerObj : MarshalByRefObject, IServerObj
         };
         collection.InsertOne(newUserModel);
         return 1;
+    }
+
+    public void Logout(string username)
+    {
+        for(int i = 0; i < activeSessions.Count; i++)
+        {
+            if (activeSessions[i].username.Equals(username))
+            {
+                activeSessions.RemoveAt(i);
+                break;
+            }
+        }
+        NotifyClients(Operation.SessionEnd, username, null);
     }
 
 

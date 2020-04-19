@@ -96,6 +96,11 @@ namespace ChatClient
             return chatName;
         }
         
+        public List<string> GetOtherUsernames()
+        {
+            return otherUsernames;
+        }
+
         public void LeaveConversation()
         {
             userLeft = true;

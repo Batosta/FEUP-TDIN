@@ -97,11 +97,44 @@ namespace ChatClient
                     break;
 
                 case Operation.SessionEnd:
-                    Console.WriteLine("DoAlterations for Operation.SessionEnd");
+
+                    lvRem = new LVRemDelegate(RemoveLoggedOutUser);
+                    BeginInvoke(lvRem, new object[] { username });
                     break;
 
                 default:
                     break;
+            }
+        }
+
+        private void RemoveLoggedOutUser(string loggedOutUsername)
+        {
+            foreach (ListViewItem item in activeSessionsList.Items)
+            {
+                if (item.SubItems[0].Text.Equals(loggedOutUsername))
+                {
+                    item.Remove();
+                    break;
+                }
+            }
+
+            for (int i = 0; i < activeSessions.Count; i++)
+            {
+                if (activeSessions[i].username.Equals(loggedOutUsername))
+                {
+                    activeSessions.RemoveAt(i);
+                    break;
+                }
+            }
+
+            for (int i = 0; i < activeConversationWindows.Count; i++)
+            {
+                if (activeConversationWindows[i].GetOtherUsernames().Contains(loggedOutUsername))
+                {
+                    activeConversationWindows[i].LeaveConversation();
+                    activeConversationWindows.RemoveAt(i);
+                    i = 0;
+                }
             }
         }
 
@@ -198,6 +231,14 @@ namespace ChatClient
             }
 
             return message;
+        }
+
+        private void logout_button_Click(object sender, EventArgs e)
+        {
+            server.alterEvent -= new AlterDelegate(evRepeater.Repeater);
+            evRepeater.alterEvent -= new AlterDelegate(DoAlterations);
+            server.Logout(username);
+            this.Close();
         }
     }
 
