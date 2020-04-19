@@ -22,7 +22,7 @@ namespace ChatClient
 
         // other variables
         List<UserSession> activeSessions;
-        public List<ConversationWindow> activeConversationWindows;
+        public Dictionary<string, ConversationWindow> activeConversationWindows;
         RemMessage remMessage;
 
         public MainWindow(IServerObj server, string username, string port)
@@ -34,7 +34,7 @@ namespace ChatClient
             this.username = username;
             this.port = port;
 
-            activeConversationWindows = new List<ConversationWindow>();
+            activeConversationWindows = new Dictionary<string, ConversationWindow>();
 
             //  Sessions list settings
             activeSessionsList.View = View.Details;
@@ -130,10 +130,10 @@ namespace ChatClient
 
             for (int i = 0; i < activeConversationWindows.Count; i++)
             {
-                if (activeConversationWindows[i].GetOtherUsernames().Contains(loggedOutUsername))
+                if (activeConversationWindows.ElementAt(i).Value.GetOtherUsernames().Contains(loggedOutUsername))
                 {
-                    activeConversationWindows[i].LeaveConversation();
-                    activeConversationWindows.RemoveAt(i);
+                    activeConversationWindows.ElementAt(i).Value.LeaveConversation();
+                    activeConversationWindows.Remove(activeConversationWindows.ElementAt(i).Key);
                     i = 0;
                 }
             }
@@ -148,12 +148,17 @@ namespace ChatClient
             }
             else
             {
+                string chatname = username;
                 List<string> selectUsernames = new List<string>();
                 foreach (ListViewItem selectedUsername in activeSessionsList.SelectedItems)
                 {
+                    chatname += selectedUsername.Text;
                     selectUsernames.Add(selectedUsername.Text);
                 }
-                SendProposal(selectUsernames);
+                if (!activeConversationWindows.ContainsKey(String.Concat(chatname.OrderBy(c => c))))
+                    SendProposal(selectUsernames);
+                else
+                    MessageBox.Show("You area already chatting with this user(s)");
             }
         }
 
@@ -191,7 +196,7 @@ namespace ChatClient
             }
 
             ConversationWindow conversationWindow = new ConversationWindow(this, server, chatName, username, usernames, addresses, previousMessages);
-            activeConversationWindows.Add(conversationWindow);
+            activeConversationWindows[chatName] = conversationWindow;
             this.Invoke((MethodInvoker)delegate
             {
                 conversationWindow.Show();
@@ -264,20 +269,21 @@ namespace ChatClient
 
         public void ReceiveMessage(string chatName, string username, string messageText, string messageTime, bool isPrivate)
         {
-            ConversationWindow window = win.activeConversationWindows.Find(windoww => windoww.GetChatName() == chatName);
-            window.WriteReceivedMessage(username, messageText, messageTime, isPrivate);
+            win.activeConversationWindows[chatName].WriteReceivedMessage(username, messageText, messageTime, isPrivate);
         }
 
         public void LeaveConversation(string chatName)
         {
-            ConversationWindow window = win.activeConversationWindows.Find(windoww => windoww.GetChatName() == chatName);
-            window.LeaveConversation();
+            win.activeConversationWindows[chatName].LeaveConversation();
         }
 
         public void ReceiveFile(string chatName, string username, byte[] file, string extension, string messageTime)
         {
-            ConversationWindow window = win.activeConversationWindows.Find(windoww => windoww.GetChatName() == chatName);
-            window.ReceiveFile(username, file, extension, messageTime);
+            win.activeConversationWindows[chatName].ReceiveFile(username, file, extension, messageTime);
+        }
+
+        public void SetupConnection()
+        {
         }
     }
 }

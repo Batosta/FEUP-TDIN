@@ -6,8 +6,6 @@ melhorar a cena dos ficheiros (por as mostrar as imagens no chat?)
 Alterar de port para address + port
 Remover openconversation para delegate anonimo (como ta na convesation window no invoke)
 
-impedir que se possam abrir 2 conversations com a mesma pessoa
-primeira mensagem a nao demorar tanto
 Quando se fecha a mainwindow com conversations abertas, peida
 
 RELATORIO
@@ -16,6 +14,8 @@ RELATORIO
 
 
 DONE:
+impedir que se possam abrir 2 conversations com a mesma pessoa
+primeira mensagem a nao demorar tanto
 login com enter (nao importante)
 meter ficheiros (nao importante)
 voltar a por as private msgs

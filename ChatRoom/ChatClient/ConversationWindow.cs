@@ -48,6 +48,7 @@ namespace ChatClient
             for (int i = 0; i < otherUsernames.Count; i++)
             {
                 IClientObj newClient = (IClientObj)RemotingServices.Connect(typeof(IClientObj), otherUsersAddresses[i]);
+                newClient.SetupConnection();
                 otherClients.Add(otherUsernames[i], newClient);
             }
         }
@@ -98,7 +99,7 @@ namespace ChatClient
                     entry.Value.LeaveConversation(chatName);
                 }
             }
-            mainWindow.activeConversationWindows.Remove(this);
+            mainWindow.activeConversationWindows.Remove(chatName);
         }
 
         string CheckPrivate(string messageToSend)
