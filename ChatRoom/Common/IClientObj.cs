@@ -20,4 +20,5 @@ public interface IClientObj
 
     void StartGroupChat(List<string> proposalSenderUsername, List<string> proposalReceiversAddresses, string chatID, ChatModel chatmodel);
     void ByeBye(string chatID);
+    void receiveFile(string chatID, byte[] fileToSend, string v1, string username, string username1, bool v2);
 }

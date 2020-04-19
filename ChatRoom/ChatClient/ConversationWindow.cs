@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
+using System.Runtime.CompilerServices;
 using System.Runtime.Remoting;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace ChatClient
@@ -16,6 +20,7 @@ namespace ChatClient
         readonly string chatID;
         ChatModel chatmodel;
         bool userbyebyed = false;
+        byte[] fileToSend;
 
         public ConversationWindow(string chatID, MainWindow win, IServerObj server, string username, string address, string otherUsername, ChatModel chatmodel)
         {
@@ -28,7 +33,7 @@ namespace ChatClient
             this.username = username;
             this.address = address;
             this.otherUsername = otherUsername;
-
+            
             string windowText = username + " talking to " + otherUsername;
             this.AcceptButton = send_message_button;
 
@@ -110,5 +115,53 @@ namespace ChatClient
         {
             return chatID;
         }
+
+        public void receiveFile(byte[] file, string extension)
+        {
+            //  Testing file received
+            Thread t = new Thread((ThreadStart)(() =>
+            {
+                var folderBrowserDialog1 = new FolderBrowserDialog();
+
+                // Show the FolderBrowserDialog.
+                DialogResult result = folderBrowserDialog1.ShowDialog();
+                if (result == DialogResult.OK)
+                {
+                    string folderName = folderBrowserDialog1.SelectedPath;
+                    File.WriteAllBytes(folderName + "/test" + extension, file);
+                }
+            }));
+            t.SetApartmentState(ApartmentState.STA);
+            t.Start();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+
+            OpenFileDialog openFileDialog1 = new OpenFileDialog();
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                string extension = Path.GetExtension(openFileDialog1.FileName);
+                fileToSend = File.ReadAllBytes(openFileDialog1.FileName);
+                Console.WriteLine("length: " + fileToSend.Length);
+                otherClient.receiveFile(chatID,
+                                        fileToSend,
+                                        extension,
+                                        "time",
+                                        username,
+                                        false);
+            }
+            
+                /*openFileDialog1.Filter =
+     "Images (*.BMP;*.JPG;*.GIF,*.PNG,*.TIFF)|*.BMP;*.JPG;*.GIF;*.PNG;*.TIFF";
+                if (openFileDialog1.ShowDialog() == DialogResult.OK)
+                {
+                    PictureBox PictureBox1 = new PictureBox();
+                    PictureBox1.Image = new Bitmap(openFileDialog1.FileName);
+
+                    // Add the new control to its parent's controls collection
+                    this.Controls.Add(PictureBox1);
+                }*/
+            }
     }
 }

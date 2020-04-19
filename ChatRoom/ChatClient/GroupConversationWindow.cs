@@ -84,7 +84,6 @@ namespace ChatClient
         }
         public void writeReceivedMessage(string message, string time, string senderUsername, bool isPrivate)
         {
-
             if (isPrivate)
             {
                 window.Invoke((MethodInvoker)delegate { message_viewer.Items.Add("(pm) " + senderUsername + ": " + message + " - " + time); });
@@ -199,6 +198,16 @@ namespace ChatClient
         public string getID()
         {
             return chatID;
+        }
+
+        public void receiveFile(byte[] file)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void receiveFile(byte[] file, string extension)
+        {
+            throw new NotImplementedException();
         }
     }
 }

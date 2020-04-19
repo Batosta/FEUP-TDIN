@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.Remoting;
 using System.Threading;
@@ -36,7 +37,7 @@ namespace ChatClient
             this.server = server;
             this.username = username;
             this.port = port;
-
+            
             activeConversationWindows = new List<IChatWindow>();
             //activeGroupConversationWindows = new List<GroupConversationWindow>();
 
@@ -326,6 +327,12 @@ namespace ChatClient
         {
             IChatWindow window = win.activeConversationWindows.Find(windoww => windoww.getID() == chatID);
             window.userByebyed();
+        }
+
+        public void receiveFile(string chatID, byte[] file, string extension, string v1, string username, bool v2)
+        {
+            IChatWindow window = win.activeConversationWindows.Find(windoww => windoww.getID() == chatID);
+            window.receiveFile(file, extension);
         }
     }
 }

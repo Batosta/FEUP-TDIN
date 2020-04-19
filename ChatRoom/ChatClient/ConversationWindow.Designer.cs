@@ -31,6 +31,7 @@
             this.message_viewer = new System.Windows.Forms.ListView();
             this.msg_text_box = new System.Windows.Forms.TextBox();
             this.send_message_button = new System.Windows.Forms.Button();
+            this.button1 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // message_viewer
@@ -63,11 +64,21 @@
             this.send_message_button.UseVisualStyleBackColor = true;
             this.send_message_button.Click += new System.EventHandler(this.Send_message_button_Click);
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(0, 0);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.TabIndex = 3;
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // ConversationWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(428, 411);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.send_message_button);
             this.Controls.Add(this.msg_text_box);
             this.Controls.Add(this.message_viewer);
@@ -75,8 +86,8 @@
             this.MinimumSize = new System.Drawing.Size(444, 450);
             this.Name = "ConversationWindow";
             this.Text = "ConversationWindow";
-            this.Load += new System.EventHandler(this.ConversationWindow_Load);
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ConversationWindow_FormClosing);
+            this.Load += new System.EventHandler(this.ConversationWindow_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -87,5 +98,6 @@
         private System.Windows.Forms.ListView message_viewer;
         private System.Windows.Forms.TextBox msg_text_box;
         private System.Windows.Forms.Button send_message_button;
+        private System.Windows.Forms.Button button1;
     }
 }

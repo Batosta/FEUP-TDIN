@@ -43,7 +43,7 @@ public class ServerObj : MarshalByRefObject, IServerObj
     * 4 - Non-existent username
     */
     public int Login(string username, string password, string port)
-    {
+        {
         var collection = database.GetCollection<UserModel>("User");
         var filter = Builders<UserModel>.Filter.Eq("Username", username);
         var user = collection.Find(filter).FirstOrDefault();
