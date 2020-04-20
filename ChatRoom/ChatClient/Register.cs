@@ -1,11 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace ChatClient
@@ -21,6 +14,8 @@ namespace ChatClient
             this.port = port;
 
             InitializeComponent();
+
+            this.AcceptButton = register_button;
         }
 
         private void register_button_Click(object sender, EventArgs e)
@@ -54,6 +49,20 @@ namespace ChatClient
                 this.Hide();
                 MainWindow mainWindow = new MainWindow(server, username_box.Text, port);
                 mainWindow.Show();
+            }
+        }
+
+        private void Register_FormClosing(Object sender, FormClosingEventArgs e)
+        {
+            if (Application.MessageLoop)
+            {
+                // WinForms app
+                Application.Exit();
+            }
+            else
+            {
+                // Console app
+                Environment.Exit(1);
             }
         }
     }

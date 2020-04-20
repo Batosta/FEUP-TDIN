@@ -38,6 +38,7 @@
             // activeSessionsList
             // 
             this.activeSessionsList.Activation = System.Windows.Forms.ItemActivation.OneClick;
+            this.activeSessionsList.CheckBoxes = true;
             this.activeSessionsList.HideSelection = false;
             this.activeSessionsList.Location = new System.Drawing.Point(57, 48);
             this.activeSessionsList.Name = "activeSessionsList";

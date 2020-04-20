@@ -15,6 +15,8 @@ namespace ChatClient
             InitializeComponent();
 
             this.port = port;
+
+            this.AcceptButton = login_button;
         }
 
         private void Login_Load(object sender, EventArgs e)
@@ -64,6 +66,20 @@ namespace ChatClient
             this.Hide();
             Register register = new Register(server, port);
             register.Show();
+        }
+
+        private void Login_FormClosing(Object sender, FormClosingEventArgs e)
+        {
+            if (Application.MessageLoop)
+            {
+                // WinForms app
+                Application.Exit();
+            }
+            else
+            {
+                // Console app
+                Environment.Exit(1);
+            }
         }
     }
 

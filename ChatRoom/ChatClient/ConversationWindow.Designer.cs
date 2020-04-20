@@ -39,7 +39,6 @@
             // 
             this.message_viewer.Activation = System.Windows.Forms.ItemActivation.OneClick;
             this.message_viewer.HideSelection = false;
-            this.message_viewer.HoverSelection = true;
             this.message_viewer.Location = new System.Drawing.Point(32, 34);
             this.message_viewer.Name = "message_viewer";
             this.message_viewer.Size = new System.Drawing.Size(358, 281);
@@ -61,7 +60,7 @@
             this.send_message_button.Name = "send_message_button";
             this.send_message_button.Size = new System.Drawing.Size(60, 23);
             this.send_message_button.TabIndex = 2;
-            this.send_message_button.Text = "Send Message";
+            this.send_message_button.Text = "Send";
             this.send_message_button.UseVisualStyleBackColor = true;
             this.send_message_button.Click += new System.EventHandler(this.Send_message_button_Click);
             // 

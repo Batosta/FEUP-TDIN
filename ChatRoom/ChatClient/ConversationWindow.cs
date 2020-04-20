@@ -82,13 +82,14 @@ namespace ChatClient
                 if (otherClients.ContainsKey(name))    //  private and valid
                 {
                     receivers.Add(name);
-                    server.StoreMessage(chatName, username, messageText, messageTime, true, otherUsernames);
+                    server.StoreMessage(chatName, username, messageText, messageTime, true, receivers);
                     otherClients[name].ReceiveMessage(chatName, username, messageText, messageTime, true);
                     message_viewer.Items.Add("Me to " + name + ": " + messageText + " - " + messageTime).BackColor = Color.FromArgb(colors[1]);
                 }
             }
 
             msg_text_box.Text = "";
+            message_viewer.Items[message_viewer.Items.Count - 1].EnsureVisible();
         }
 
         private void ConversationWindow_FormClosing(Object sender, FormClosingEventArgs e)
@@ -129,6 +130,7 @@ namespace ChatClient
                 mainWindow.Invoke((MethodInvoker)delegate
                 {
                     message_viewer.Items.Add(messageToBeDisplay).BackColor = Color.FromArgb(colors[1]);
+                    message_viewer.Items[message_viewer.Items.Count - 1].EnsureVisible();
                 });
             }
             else
@@ -137,6 +139,7 @@ namespace ChatClient
                 mainWindow.Invoke((MethodInvoker)delegate
                 {
                     message_viewer.Items.Add(messageToBeDisplay).BackColor = Color.FromArgb(colors[2]);
+                    message_viewer.Items[message_viewer.Items.Count - 1].EnsureVisible();
                 });
             }
         }
@@ -185,6 +188,7 @@ namespace ChatClient
                         message_viewer.Items.Add(message).BackColor = Color.FromArgb(colors[2]);
                     }
                 }
+                message_viewer.Items[message_viewer.Items.Count - 1].EnsureVisible();
             }
         }
 
@@ -207,6 +211,10 @@ namespace ChatClient
             }
 
             message_viewer.Items.Add("Chatting with " + stringUsernames);
+
+
+            if(otherUsernames.Count == 1)
+                label1.Visible = false;
         }
 
         private string GetConversationTitle()

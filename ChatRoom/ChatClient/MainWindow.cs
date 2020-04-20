@@ -142,22 +142,11 @@ namespace ChatClient
             {
                 activeConversationWindows[conversationToLeave].LeaveConversation();
             }
-            /*
-            for (int i = 0; i < activeConversationWindows.Count; i++)
-            {
-                if (activeConversationWindows.ElementAt(i).Value.GetOtherUsernames().Contains(loggedOutUsername))
-                {
-                    activeConversationWindows.ElementAt(i).Value.LeaveConversation();
-                    //activeConversationWindows.Remove(activeConversationWindows.ElementAt(i).Key);
-                    i = 0;
-                }
-            }
-            */
         }
 
         private void start_conversation_Click(object sender, EventArgs e)
         {
-            if (activeSessionsList.SelectedItems.Count == 0)
+            if (activeSessionsList.CheckedItems.Count == 0)
             {
                 MessageBox.Show("Please choose at least one user to chat with.");
                 return;
@@ -165,16 +154,18 @@ namespace ChatClient
             else
             {
                 string chatname = username;
-                List<string> selectUsernames = new List<string>();
-                foreach (ListViewItem selectedUsername in activeSessionsList.SelectedItems)
+                List<string> checkedUsernames = new List<string>();
+                foreach (ListViewItem checkedUsername in activeSessionsList.CheckedItems)
                 {
-                    chatname += selectedUsername.Text;
-                    selectUsernames.Add(selectedUsername.Text);
+                    chatname += checkedUsername.Text;
+                    checkedUsernames.Add(checkedUsername.Text);
                 }
                 if (!activeConversationWindows.ContainsKey(String.Concat(chatname.OrderBy(c => c))))
-                    SendProposal(selectUsernames);
+                    SendProposal(checkedUsernames);
                 else
                     MessageBox.Show("You area already chatting with this user(s)");
+
+
             }
         }
 
@@ -265,15 +256,15 @@ namespace ChatClient
             server.alterEvent -= new AlterDelegate(evRepeater.Repeater);
             evRepeater.alterEvent -= new AlterDelegate(DoAlterations);
             server.Logout(username);
-            if (System.Windows.Forms.Application.MessageLoop)
+            if (Application.MessageLoop)
             {
                 // WinForms app
-                System.Windows.Forms.Application.Exit();
+                Application.Exit();
             }
             else
             {
                 // Console app
-                System.Environment.Exit(1);
+                Environment.Exit(1);
             }
         }
 

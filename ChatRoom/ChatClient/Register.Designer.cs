@@ -110,6 +110,7 @@
             this.Controls.Add(this.register_button);
             this.Name = "Register";
             this.Text = "Register";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Register_FormClosing);
             this.ResumeLayout(false);
             this.PerformLayout();
 
