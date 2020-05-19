@@ -1,0 +1,64 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28803.352
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TTService", "TTService\TTService.csproj", "{8AB4ED96-EF23-4D20-8819-BBA00AE2770D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TTServer", "TTServer\TTServer.csproj", "{DAB4EDFA-24D9-4B9B-A71B-29EE45F869A3}"
+EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "TTSite", "TTSite\", "{4AB8B090-33FD-494E-91D1-50203005C57A}"
+	ProjectSection(WebsiteProperties) = preProject
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.8"
+		ProjectReferences = "{8ab4ed96-ef23-4d20-8819-bba00ae2770d}|TTService.dll;"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_55165"
+		Debug.AspNetCompiler.PhysicalPath = "TTSite\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_55165\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_55165"
+		Release.AspNetCompiler.PhysicalPath = "TTSite\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_55165\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "55165"
+		SlnRelativePath = "TTSite\"
+		DefaultWebSiteLanguage = "Visual C#"
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TTClient", "TTClient\TTClient.csproj", "{E82D3856-CFC8-487C-9CBB-128934274E87}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8AB4ED96-EF23-4D20-8819-BBA00AE2770D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8AB4ED96-EF23-4D20-8819-BBA00AE2770D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8AB4ED96-EF23-4D20-8819-BBA00AE2770D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8AB4ED96-EF23-4D20-8819-BBA00AE2770D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DAB4EDFA-24D9-4B9B-A71B-29EE45F869A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DAB4EDFA-24D9-4B9B-A71B-29EE45F869A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DAB4EDFA-24D9-4B9B-A71B-29EE45F869A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DAB4EDFA-24D9-4B9B-A71B-29EE45F869A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4AB8B090-33FD-494E-91D1-50203005C57A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4AB8B090-33FD-494E-91D1-50203005C57A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4AB8B090-33FD-494E-91D1-50203005C57A}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{4AB8B090-33FD-494E-91D1-50203005C57A}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{E82D3856-CFC8-487C-9CBB-128934274E87}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E82D3856-CFC8-487C-9CBB-128934274E87}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E82D3856-CFC8-487C-9CBB-128934274E87}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E82D3856-CFC8-487C-9CBB-128934274E87}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {05511607-E5AE-465F-B369-4D4D006277C7}
+	EndGlobalSection
+EndGlobal
