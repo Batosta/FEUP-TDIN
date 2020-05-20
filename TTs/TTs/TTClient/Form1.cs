@@ -34,8 +34,8 @@ namespace TTClient {
       return Channel.GetTickets(author);
     }
 
-    public int AddTicket(string author, string desc) {
-      return Channel.AddTicket(author, desc);
+    public int AddTicket(string author, string title, string problem) {
+      return Channel.AddTicket(author, title, problem);
     }
   }
 

@@ -4,7 +4,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
-    <title>TTSystem</title>
+    <title>Trouble Tickets</title>
     <style type="text/css">
       .auto-style1 {
         width: 100%;
@@ -19,7 +19,7 @@
   <form id="form1" runat="server">
     <div>
     
-      <h1>Acme Corporation TTSystem</h1>
+      <h1>Enterprise Trouble Tickets</h1>
       <table class="auto-style1">
         <tr>
           <td class="auto-style3">Author:</td>
@@ -29,9 +29,15 @@
           </td>
         </tr>
         <tr>
+          <td class="auto-style3">Title: </td>
+          <td>
+            <asp:TextBox ID="TextBox1" runat="server" Height="20px" Width="600px"></asp:TextBox>
+          </td>
+        </tr>
+        <tr>
           <td class="auto-style3">Problem: </td>
           <td>
-            <asp:TextBox ID="TextBox1" runat="server" Height="100px" TextMode="MultiLine" Width="600px"></asp:TextBox>
+            <asp:TextBox ID="TextBox2" runat="server" Height="100px" TextMode="MultiLine" Width="600px"></asp:TextBox>
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <asp:Button ID="Button1" runat="server" Text="Submit" OnClick="Button1_Click" />
           </td>
