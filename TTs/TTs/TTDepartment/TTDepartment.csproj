@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{E82D3856-CFC8-487C-9CBB-128934274E87}</ProjectGuid>
+    <ProjectGuid>{8F5C3181-7AD4-4320-8DD2-356988A56323}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>TTClient</RootNamespace>
-    <AssemblyName>TTClient</AssemblyName>
+    <RootNamespace>TTDepartment</RootNamespace>
+    <AssemblyName>TTDepartment</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -33,7 +33,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Messaging" />
@@ -84,7 +83,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TTService\TTService.csproj">
-      <Project>{8AB4ED96-EF23-4D20-8819-BBA00AE2770D}</Project>
+      <Project>{8ab4ed96-ef23-4d20-8819-bba00ae2770d}</Project>
       <Name>TTService</Name>
     </ProjectReference>
   </ItemGroup>

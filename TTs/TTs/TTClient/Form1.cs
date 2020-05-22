@@ -4,18 +4,24 @@ using System.ServiceModel;
 using System.Windows.Forms;
 using TTService;
 using Microsoft.VisualBasic;
+using System.Messaging;
 
 namespace TTClient 
 {
     public partial class Form1 : Form 
     {
         TTProxy proxy;
+        MessageQueue messageQueue;
 
         public Form1() 
         {
             int k;
 
             InitializeComponent();
+
+            if (!MessageQueue.Exists(@".\private$\myMSMQ"))
+                MessageQueue.Create(@".\private$\myMSMQ");
+
             proxy = new TTProxy();
             DataTable users = proxy.GetPeopleByRole("solver");
             for (k = 0; k < users.Rows.Count; k++)
@@ -82,6 +88,43 @@ namespace TTClient
             else
             {
                 MessageBox.Show("Please choose a solver before answering a trouble ticket.");
+                return;
+            }
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            if (listBox1.SelectedItems.Count != 0)
+            {
+                if (dataGridView2.SelectedRows.Count != 0)
+                {
+                    string questions = Interaction.InputBox("Questions for the department:", "Questions", "");
+                    if (String.IsNullOrWhiteSpace(questions))
+                    {
+                        MessageBox.Show("Invalid input.");
+                        return;
+                    }
+                    else
+                    {
+                        string ticket_id = dataGridView2.SelectedRows[0].Cells["Id"].Value.ToString();
+                        string title = dataGridView2.SelectedRows[0].Cells["Title"].Value.ToString();
+                        string problem = dataGridView2.SelectedRows[0].Cells["Problem"].Value.ToString();
+                        string[] messageData = new string[4] { ticket_id, title, problem, questions };
+
+                        messageQueue = new MessageQueue(@".\private$\myMSMQ");
+                        messageQueue.Formatter = new XmlMessageFormatter(new Type[] { typeof(String[]) });
+                        messageQueue.Send(messageData);
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Please choose one of the assigned tickets sending it to the department.");
+                    return;
+                }
+            }
+            else
+            {
+                MessageBox.Show("Please choose a solver before sending the trouble ticket to the department.");
                 return;
             }
         }

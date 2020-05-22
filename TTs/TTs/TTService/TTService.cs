@@ -2,6 +2,7 @@
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Messaging;
 
 namespace TTService
 {
@@ -9,10 +10,15 @@ namespace TTService
     {
         readonly string database;
 
+        string messageQueueName = "myMSMQ";
+        MessageQueue messageQueue;
+
         TTService()
         {
             string connection = ConfigurationManager.ConnectionStrings["TTs"].ConnectionString;
             database = String.Format(connection, AppDomain.CurrentDomain.BaseDirectory);
+
+            messageQueue = new MessageQueue();
         }
 
         public int AddTicket(string author, string title, string problem) {
@@ -21,7 +27,7 @@ namespace TTService
             using (SqlConnection c = new SqlConnection(database)) {
                 try {
                     c.Open();
-                    string sql = "insert into TroubleTickets(Author, Title, Problem, Answer, Status, Date) values (@a1, @t1, @p1, '', 'unassigned', @d1)";     // injection protection
+                    string sql = "insert into TroubleTickets(Author, Title, Problem, Answer, Status, Solver, Date) values (@a1, @t1, @p1, '', 'unassigned', NULL, @d1)";     // injection protection
                     SqlCommand cmd = new SqlCommand(sql, c);                                                                                        // injection protection
                     cmd.Parameters.AddWithValue("@a1", author);                                                                                     // injection protection
                     cmd.Parameters.AddWithValue("@t1", title);                                                                                      // injection protection
@@ -49,9 +55,10 @@ namespace TTService
                 try
                 {
                     c.Open();
-                    string sql = "update TroubleTickets set Status=@s1 where Id=@i1";
+                    string sql = "update TroubleTickets set Status=@s1, Solver=@s2 where Id=@i1";
                     SqlCommand cmd = new SqlCommand(sql, c);
-                    cmd.Parameters.AddWithValue("@s1", "assigned to " + solver_name);
+                    cmd.Parameters.AddWithValue("@s1", "assigned");
+                    cmd.Parameters.AddWithValue("@s2", solver_name);
                     cmd.Parameters.AddWithValue("@i1", Int32.Parse(ticket_id));
                     cmd.ExecuteNonQuery();
                 }
@@ -125,7 +132,7 @@ namespace TTService
                 try
                 {
                     c.Open();
-                    string sql = "select Title, Problem, Status, Answer, Date from TroubleTickets where Author=@a1";
+                    string sql = "select Title, Problem, Status, Solver, Answer, Date from TroubleTickets where Author=@a1";
                     SqlCommand cmd = new SqlCommand(sql, c);
                     cmd.Parameters.AddWithValue("@a1", author);
                     SqlDataAdapter adapter = new SqlDataAdapter(cmd);
@@ -140,6 +147,7 @@ namespace TTService
                     c.Close();
                 }
             }
+
             return result;
         }
 
@@ -147,14 +155,18 @@ namespace TTService
         {
             DataTable result = new DataTable("Tickets");
 
+            Console.WriteLine("solver: " + solver);
+
             using (SqlConnection c = new SqlConnection(database))
             {
                 try
                 {
                     c.Open();
-                    string sql = "select Id, Title, Problem, Status, Date from TroubleTickets where Status=@s1";
+                    string sql = "select Id, Title, Problem, Status, Date from TroubleTickets where (Status=@s1 OR Status=@s2) AND Solver=@s3";
                     SqlCommand cmd = new SqlCommand(sql, c);
-                    cmd.Parameters.AddWithValue("@s1", "assigned to " + solver);
+                    cmd.Parameters.AddWithValue("@s1", "assigned");
+                    cmd.Parameters.AddWithValue("@s2", "waiting for answers");
+                    cmd.Parameters.AddWithValue("@s3", solver);
                     SqlDataAdapter adapter = new SqlDataAdapter(cmd);
                     adapter.Fill(result);
                 }
@@ -206,5 +218,90 @@ namespace TTService
             result += date.Second;
             return result;
         }
+
+        private DataTable GetTicketById(int ticket_id)
+        {
+            DataTable result = new DataTable("Ticket");
+
+            using (SqlConnection c = new SqlConnection(database))
+            {
+                try
+                {
+                    c.Open();
+                    string sql = "select * from TroubleTickets where Id=@i1";
+                    SqlCommand cmd = new SqlCommand(sql, c);
+                    cmd.Parameters.AddWithValue("@i1", ticket_id);
+                    SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+                    adapter.Fill(result);
+                }
+                catch (SqlException sqlEx)
+                {
+                    Console.WriteLine(sqlEx);
+                }
+                finally
+                {
+                    c.Close();
+                }
+            }
+            return result;
+        }
+       
+        /*
+        private int GetPeopleIdByName(string name)
+        {
+            DataTable result = new DataTable("People");
+
+            using (SqlConnection c = new SqlConnection(database))
+            {
+                try
+                {
+                    c.Open();
+                    string sql = "select Id from People where Name=@n1";
+                    SqlCommand cmd = new SqlCommand(sql, c);
+                    cmd.Parameters.AddWithValue("@n1", name);
+                    SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+                    adapter.Fill(result);
+                }
+                catch (SqlException sqlEx)
+                {
+                    Console.WriteLine(sqlEx);
+                }
+                finally
+                {
+                    c.Close();
+                }
+            }
+
+            return (int)result.Rows[0]["Id"];
+        }
+
+        private string GetPeopleNameById(int id)
+        {
+            DataTable result = new DataTable("People");
+
+            using (SqlConnection c = new SqlConnection(database))
+            {
+                try
+                {
+                    c.Open();
+                    string sql = "select Name from People where Id=@i1";
+                    SqlCommand cmd = new SqlCommand(sql, c);
+                    cmd.Parameters.AddWithValue("@n1", id);
+                    SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+                    adapter.Fill(result);
+                }
+                catch (SqlException sqlEx)
+                {
+                    Console.WriteLine(sqlEx);
+                }
+                finally
+                {
+                    c.Close();
+                }
+            }
+
+            return result.Rows[0]["Name"].ToString();
+        }
+        */
     }
 }
