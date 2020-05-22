@@ -69,6 +69,11 @@ class TTProxy : ClientBase<ITTService>, ITTService
         Channel.AnswerToTicket(answer, ticket_id);
     }
 
+    public void TicketWaitingForAnswers(string ticket_id)
+    {
+        Channel.TicketWaitingForAnswers(ticket_id);
+    }
+
     public DataTable GetUnassignedTickets()
     {
         return Channel.GetUnassignedTickets();
@@ -87,6 +92,11 @@ class TTProxy : ClientBase<ITTService>, ITTService
     public DataTable GetPeopleByRole(string role)
     {
         return Channel.GetPeopleByRole(role);
+    }
+
+    public void AnswerToQuestion(string answer, string ticket_id)
+    {
+        throw new NotImplementedException();
     }
 }
 

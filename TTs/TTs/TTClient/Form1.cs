@@ -114,6 +114,8 @@ namespace TTClient
                         messageQueue = new MessageQueue(@".\private$\myMSMQ");
                         messageQueue.Formatter = new XmlMessageFormatter(new Type[] { typeof(String[]) });
                         messageQueue.Send(messageData);
+
+                        proxy.TicketWaitingForAnswers(ticket_id);
                     }
                 }
                 else
@@ -152,6 +154,15 @@ namespace TTClient
         public void AnswerToTicket(string answer, string ticket_id)
         {
             Channel.AnswerToTicket(answer, ticket_id);
+        }
+
+        public void AnswerToQuestion(string answer, string ticket_id)
+        {
+            Channel.AnswerToQuestion(answer, ticket_id);
+        }
+        public void TicketWaitingForAnswers(string ticket_id)
+        {
+            Channel.TicketWaitingForAnswers(ticket_id);
         }
 
         public DataTable GetUnassignedTickets()

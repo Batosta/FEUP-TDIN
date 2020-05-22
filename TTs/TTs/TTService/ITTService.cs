@@ -19,6 +19,14 @@ namespace TTService
         [OperationContract]
         void AnswerToTicket(string answer, string ticket_id);
 
+        [WebInvoke(Method = "PUT", UriTemplate = "/question_answer/{ticket_id}/{answer}", BodyStyle = WebMessageBodyStyle.WrappedRequest, RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        [OperationContract]
+        void AnswerToQuestion(string answer, string ticket_id);
+
+        [WebInvoke(Method = "PUT", UriTemplate = "/secondary_question/{ticket_id}", BodyStyle = WebMessageBodyStyle.WrappedRequest, RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        [OperationContract]
+        void TicketWaitingForAnswers(string ticket_id);
+
         [WebGet(UriTemplate = "/tickets", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         DataTable GetUnassignedTickets();

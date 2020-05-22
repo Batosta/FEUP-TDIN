@@ -96,6 +96,51 @@ namespace TTService
                 }
             }
         }
+        public void AnswerToQuestion(string answer, string ticket_id)
+        {
+            using (SqlConnection c = new SqlConnection(database))
+            {
+                try
+                {
+                    c.Open();
+                    string sql = "update TroubleTickets set Answer2=@a1, Status='answered' where Id=@i1";
+                    SqlCommand cmd = new SqlCommand(sql, c);
+                    cmd.Parameters.AddWithValue("@a1", answer);
+                    cmd.Parameters.AddWithValue("@i1", Int32.Parse(ticket_id));
+                    cmd.ExecuteNonQuery();
+                }
+                catch (SqlException sqlEx)
+                {
+                    Console.WriteLine(sqlEx);
+                }
+                finally
+                {
+                    c.Close();
+                }
+            }
+        }
+        public void TicketWaitingForAnswers(string ticket_id)
+        {
+            using (SqlConnection c = new SqlConnection(database))
+            {
+                try
+                {
+                    c.Open();
+                    string sql = "update TroubleTickets set Status='waiting for answers' where Id=@i1";
+                    SqlCommand cmd = new SqlCommand(sql, c);
+                    cmd.Parameters.AddWithValue("@i1", Int32.Parse(ticket_id));
+                    cmd.ExecuteNonQuery();
+                }
+                catch (SqlException sqlEx)
+                {
+                    Console.WriteLine(sqlEx);
+                }
+                finally
+                {
+                    c.Close();
+                }
+            }
+        }
 
         public DataTable GetUnassignedTickets()
         {
@@ -162,11 +207,12 @@ namespace TTService
                 try
                 {
                     c.Open();
-                    string sql = "select Id, Title, Problem, Status, Date from TroubleTickets where (Status=@s1 OR Status=@s2) AND Solver=@s3";
+                    string sql = "select Id, Title, Problem, Status, Answer2, Date from TroubleTickets where (Status=@s1 OR Status=@s2 OR Status=@s3) AND Solver=@s4";
                     SqlCommand cmd = new SqlCommand(sql, c);
                     cmd.Parameters.AddWithValue("@s1", "assigned");
                     cmd.Parameters.AddWithValue("@s2", "waiting for answers");
-                    cmd.Parameters.AddWithValue("@s3", solver);
+                    cmd.Parameters.AddWithValue("@s3", "answered");
+                    cmd.Parameters.AddWithValue("@s4", solver);
                     SqlDataAdapter adapter = new SqlDataAdapter(cmd);
                     adapter.Fill(result);
                 }
@@ -245,7 +291,7 @@ namespace TTService
             }
             return result;
         }
-       
+
         /*
         private int GetPeopleIdByName(string name)
         {
