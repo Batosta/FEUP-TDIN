@@ -3,6 +3,8 @@ using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Messaging;
+using System.Net;
+using System.Net.Mail;
 
 namespace TTService
 {
@@ -21,11 +23,14 @@ namespace TTService
             messageQueue = new MessageQueue();
         }
 
-        public int AddTicket(string author, string title, string problem) {
+        public int AddTicket(string author, string title, string problem)
+        {
             int id = 0;
 
-            using (SqlConnection c = new SqlConnection(database)) {
-                try {
+            using (SqlConnection c = new SqlConnection(database))
+            {
+                try
+                {
                     c.Open();
                     string sql = "insert into TroubleTickets(Author, Title, Problem, Answer, Status, Solver, Date) values (@a1, @t1, @p1, '', 'unassigned', NULL, @d1)";     // injection protection
                     SqlCommand cmd = new SqlCommand(sql, c);                                                                                        // injection protection
@@ -41,7 +46,8 @@ namespace TTService
                 {
                     Console.WriteLine(sqlEx);
                 }
-                finally {
+                finally
+                {
                     c.Close();
                 }
             }
@@ -85,6 +91,9 @@ namespace TTService
                     cmd.Parameters.AddWithValue("@a1", answer);
                     cmd.Parameters.AddWithValue("@i1", Int32.Parse(ticket_id));
                     cmd.ExecuteNonQuery();
+
+                    SendEmail(ticket_id, answer);
+                    Console.WriteLine("email sent");
                 }
                 catch (SqlException sqlEx)
                 {
@@ -96,6 +105,105 @@ namespace TTService
                 }
             }
         }
+
+        private void SendEmail(string ticket_id, string answer)
+        {
+            using (SqlConnection c = new SqlConnection(database))
+            {
+                DataTable result = new DataTable("Author");
+                DataTable result2 = new DataTable("Email");
+                try
+                {
+                    c.Open();
+                    string sql = "select Title, Author from TroubleTickets where Id=@i1";
+                    SqlCommand cmd = new SqlCommand(sql, c);
+                    cmd.Parameters.AddWithValue("@i1", ticket_id);
+                    SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+                    adapter.Fill(result);
+                    Console.WriteLine("result");
+                    Console.WriteLine(result.Rows[0][0]);
+                    Console.WriteLine(result.Rows[0][1]);
+
+                    sql = "select Name, Email from People where Id=@i1";
+                    cmd = new SqlCommand(sql, c);
+                    cmd.Parameters.AddWithValue("@i1", result.Rows[0][1]);
+                    adapter = new SqlDataAdapter(cmd);
+                    adapter.Fill(result2);
+                    Console.WriteLine("result2");
+                    Console.WriteLine(result2.Rows[0][0]);
+                    Console.WriteLine((string)result2.Rows[0][1]);
+
+                    //cria uma mensagem
+                    MailMessage mail = new MailMessage();
+
+                    //define os endereços
+                    mail.From = new MailAddress("solverproblem05@gmail.com");
+                    mail.To.Add("up201605330@fe.up.pt");
+                    //mail.To.Add((string)result2.Rows[0][1]);
+
+                    //define o conteúdo
+                    mail.Subject = "Problem " + result.Rows[0][0] + " solved";
+                    mail.Body = answer;
+
+                    try
+                    {
+                        //envia a mensagem
+                        SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587);
+                        smtp.EnableSsl = true;
+                        smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
+                        smtp.UseDefaultCredentials = false;
+                        NetworkCredential cred = new NetworkCredential("solverproblem05@gmail.com", "problemsolver");
+                        // inclui as credenciais
+                        smtp.Credentials = cred;
+                        smtp.Send(mail);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex);
+                    }
+                    /*
+                    try
+                    {
+                        SmtpClient SmtpServer = new SmtpClient("smtp.gmail.com");
+                        SmtpServer.UseDefaultCredentials = false;
+                        SmtpServer.Credentials = new System.Net.NetworkCredential("anymail@example.com", "password");
+                        SmtpServer.Port = 587;
+                        SmtpServer.DeliveryMethod = SmtpDeliveryMethod.Network;
+                        SmtpServer.EnableSsl = true;
+                        SmtpServer.Send(message);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex);
+                    }
+                    */
+                }
+                catch (SqlException sqlEx)
+                {
+                    Console.WriteLine(sqlEx);
+                }
+                finally
+                {
+                    c.Close();
+                }
+
+                Console.WriteLine("test");
+            }
+        }
+/*
+        private void CreateEmailItem(string subjectEmail,
+       string toEmail, string bodyEmail)
+        {
+            Outlook.MailItem eMail = (Outlook.MailItem)
+                this.Application.CreateItem(Outlook.OlItemType.olMailItem);
+            eMail.Subject = subjectEmail;
+            eMail.To = toEmail;
+            eMail.Body = bodyEmail;
+            eMail.Importance = Outlook.OlImportance.olImportanceLow;
+            ((Outlook._MailItem)eMail).Send();
+        }
+        */
+
         public void AnswerToQuestion(string answer, string ticket_id)
         {
             using (SqlConnection c = new SqlConnection(database))
@@ -156,7 +264,7 @@ namespace TTService
                     SqlDataAdapter adapter = new SqlDataAdapter(cmd);
                     adapter.Fill(result);
                 }
-                catch(SqlException sqlEx)
+                catch (SqlException sqlEx)
                 {
                     Console.WriteLine(sqlEx);
                 }
@@ -232,8 +340,10 @@ namespace TTService
         {
             DataTable result = new DataTable("People");
 
-            using (SqlConnection c = new SqlConnection(database)) {
-                try {
+            using (SqlConnection c = new SqlConnection(database))
+            {
+                try
+                {
                     c.Open();
                     string sql = "select * from People where Role=@r1";
                     SqlCommand cmd = new SqlCommand(sql, c);
@@ -245,7 +355,8 @@ namespace TTService
                 {
                     Console.WriteLine(sqlEx);
                 }
-                finally {
+                finally
+                {
                     c.Close();
                 }
             }
