@@ -47,15 +47,10 @@ namespace TTDepartment
 
                 String[] messageData = (String[])newMessage.Body;
 
-                UpdateUnansweredTickets(messageData);
+                dataGridView1.Rows.Add(messageData[0], messageData[1], messageData[2], messageData[3]);
 
                 msgQueue.BeginReceive();
             }
-        }
-
-        private void UpdateUnansweredTickets(String[] messageData)
-        {
-            dataGridView1.Rows.Add(messageData[0], messageData[1], messageData[2], messageData[3]);
         }
 
         private void button1_Click(object sender, EventArgs e)

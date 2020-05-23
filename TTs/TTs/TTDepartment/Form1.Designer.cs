@@ -44,7 +44,7 @@
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(83, 40);
             this.button1.TabIndex = 2;
-            this.button1.Text = "Answered to Ticket";
+            this.button1.Text = "Answer to Ticket";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
@@ -75,6 +75,9 @@
             this.dataGridView1.Location = new System.Drawing.Point(17, 56);
             this.dataGridView1.MultiSelect = false;
             this.dataGridView1.Name = "dataGridView1";
+            this.dataGridView1.ReadOnly = true;
+            this.dataGridView1.RowHeadersVisible = false;
+            this.dataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dataGridView1.Size = new System.Drawing.Size(761, 237);
             this.dataGridView1.TabIndex = 0;
             // 
@@ -82,21 +85,25 @@
             // 
             this.Id.HeaderText = "ID";
             this.Id.Name = "Id";
+            this.Id.ReadOnly = true;
             // 
             // Title
             // 
             this.Title.HeaderText = "Title";
             this.Title.Name = "Title";
+            this.Title.ReadOnly = true;
             // 
             // Problem
             // 
             this.Problem.HeaderText = "Problem";
             this.Problem.Name = "Problem";
+            this.Problem.ReadOnly = true;
             // 
             // Questions
             // 
             this.Questions.HeaderText = "Questions";
             this.Questions.Name = "Questions";
+            this.Questions.ReadOnly = true;
             // 
             // Form1
             // 

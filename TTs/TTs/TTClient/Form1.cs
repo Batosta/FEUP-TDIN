@@ -5,13 +5,16 @@ using System.Windows.Forms;
 using TTService;
 using Microsoft.VisualBasic;
 using System.Messaging;
+using System.Threading;
+using Timer = System.Threading.Timer;
 
 namespace TTClient 
-{
+{   
     public partial class Form1 : Form 
     {
         TTProxy proxy;
         MessageQueue messageQueue;
+        static System.Threading.Timer timer;
 
         public Form1() 
         {
@@ -27,7 +30,45 @@ namespace TTClient
             for (k = 0; k < users.Rows.Count; k++)
                 listBox1.Items.Add(users.Rows[k][1]);   // Row 0 is empty; the author name is in column 1
 
-            updateUnassignedTicketsListBox();
+            DataTable unassigned_tickets = proxy.GetUnassignedTickets();
+            dataGridView1.DataSource = unassigned_tickets;
+
+            DateTime start = DateTime.Now;
+            timer = new Timer(_ => UpdateTickets(start), null, 1000, 500);
+
+        }
+
+        private void UpdateTickets(DateTime start)
+        {
+            Invoke((MethodInvoker)delegate
+            {
+                int index1 = 0;
+                if (dataGridView1.SelectedRows.Count != 0)
+                {
+                    index1 = dataGridView1.SelectedRows[0].Index;
+                }
+                DataTable unassigned_tickets = proxy.GetUnassignedTickets();
+                dataGridView1.DataSource = unassigned_tickets;
+                if(index1 < unassigned_tickets.Rows.Count)
+                    dataGridView1.Rows[index1].Selected = true;
+                
+
+
+                if (listBox1.SelectedItems.Count != 0)
+                {
+                    string solver = listBox1.SelectedItem.ToString();
+
+                    int index2 = 0;
+                    if (dataGridView2.SelectedRows.Count != 0)
+                    {
+                        index2 = dataGridView2.SelectedRows[0].Index;
+                    }
+                    DataTable tickets = proxy.GetTicketsBySolver(solver);
+                    dataGridView2.DataSource = tickets;
+                    if(index2 < tickets.Rows.Count)
+                        dataGridView2.Rows[index2].Selected = true;
+                }
+            });
         }
 
         private void listBox1_SelectedIndexChanged(object sender, System.EventArgs e) 
@@ -46,7 +87,6 @@ namespace TTClient
                     string solver_name = listBox1.SelectedItem.ToString();
                     string ticket_id = dataGridView1.SelectedRows[0].Cells["Id"].Value.ToString();
                     proxy.AssignTicketToSolver(solver_name, ticket_id);
-                    updateUnassignedTicketsListBox();
                 }
                 else
                 {
@@ -130,12 +170,6 @@ namespace TTClient
                 return;
             }
         }
-
-        private void updateUnassignedTicketsListBox()
-        {
-            DataTable unassigned_tickets = proxy.GetUnassignedTickets();
-            dataGridView1.DataSource = unassigned_tickets;
-        }
     }
 
     // Manual proxy to the service (in alternative to direct HTTP requests)
@@ -160,6 +194,7 @@ namespace TTClient
         {
             Channel.AnswerToQuestion(answer, ticket_id);
         }
+        
         public void TicketWaitingForAnswers(string ticket_id)
         {
             Channel.TicketWaitingForAnswers(ticket_id);
