@@ -34,7 +34,7 @@
             this.Id = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Title = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Problem = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Questions = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Question = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -71,7 +71,7 @@
             this.Id,
             this.Title,
             this.Problem,
-            this.Questions});
+            this.Question});
             this.dataGridView1.Location = new System.Drawing.Point(17, 56);
             this.dataGridView1.MultiSelect = false;
             this.dataGridView1.Name = "dataGridView1";
@@ -83,7 +83,7 @@
             // 
             // Id
             // 
-            this.Id.HeaderText = "ID";
+            this.Id.HeaderText = "Id";
             this.Id.Name = "Id";
             this.Id.ReadOnly = true;
             // 
@@ -99,11 +99,11 @@
             this.Problem.Name = "Problem";
             this.Problem.ReadOnly = true;
             // 
-            // Questions
+            // Question
             // 
-            this.Questions.HeaderText = "Questions";
-            this.Questions.Name = "Questions";
-            this.Questions.ReadOnly = true;
+            this.Question.HeaderText = "Question";
+            this.Question.Name = "Question";
+            this.Question.ReadOnly = true;
             // 
             // Form1
             // 
@@ -128,7 +128,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn Id;
         private System.Windows.Forms.DataGridViewTextBoxColumn Title;
         private System.Windows.Forms.DataGridViewTextBoxColumn Problem;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Questions;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Question;
     }
 }
 

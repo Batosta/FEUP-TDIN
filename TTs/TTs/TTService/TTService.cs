@@ -147,6 +147,23 @@ namespace TTService
                 try
                 {
                     c.Open();
+                    string sql = "delete from SecondaryQuestions where TTId=@i1";
+                    SqlCommand cmd = new SqlCommand(sql, c);
+                    cmd.Parameters.AddWithValue("@i1", Int32.Parse(ticket_id));
+                    cmd.ExecuteNonQuery();
+                }
+                catch (SqlException sqlEx)
+                {
+                    Console.WriteLine(sqlEx);
+                }
+                finally
+                {
+                    c.Close();
+                }
+
+                try
+                {
+                    c.Open();
                     string sql = "update TroubleTickets set DepartmentExplanation=@a1, Status='assigned' where Id=@i1";
                     SqlCommand cmd = new SqlCommand(sql, c);
                     cmd.Parameters.AddWithValue("@a1", answer);
@@ -298,6 +315,58 @@ namespace TTService
             return result;
         }
 
+        public DataTable GetUnansweredSecondaryQuestions()
+        {
+            DataTable result = new DataTable("UnansweredSecondaryQuestions");
+
+            using (SqlConnection c = new SqlConnection(database))
+            {
+                try
+                {
+                    c.Open();
+                    string sql = "select Id, Title, Problem, Question from SecondaryQuestions";
+                    SqlCommand cmd = new SqlCommand(sql, c);
+                    SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+                    adapter.Fill(result);
+                }
+                catch (SqlException sqlEx)
+                {
+                    Console.WriteLine(sqlEx);
+                }
+                finally
+                {
+                    c.Close();
+                }
+            }
+            return result;
+        }
+
+        public void AddSecondaryQuestion(string ticket_id, string title, string problem, string question)
+        {
+            using (SqlConnection c = new SqlConnection(database))
+            {
+                try
+                {
+                    c.Open();
+                    string sql = "insert into SecondaryQuestions(TTId, Title, Problem, Question) values (@i1, @t1, @p1, @q1)";     // injection protection
+                    SqlCommand cmd = new SqlCommand(sql, c);                                                                                        // injection protection
+                    cmd.Parameters.AddWithValue("@i1", Int32.Parse(ticket_id));                                                                                     // injection protection
+                    cmd.Parameters.AddWithValue("@t1", title);                                                                                      // injection protection
+                    cmd.Parameters.AddWithValue("@p1", problem);                                                                                    // injection protection
+                    cmd.Parameters.AddWithValue("@q1", question);                                                                                  // injection protection
+                    cmd.ExecuteNonQuery();
+                }
+                catch (SqlException sqlEx)
+                {
+                    Console.WriteLine(sqlEx);
+                }
+                finally
+                {
+                    c.Close();
+                }
+            }
+        }
+
 
 
         private DataTable GetTicketById(string ticket_id)
@@ -353,7 +422,6 @@ namespace TTService
             }
             return result;
         }
-
 
         private string GetDate()
         {

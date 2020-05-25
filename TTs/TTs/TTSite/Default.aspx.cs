@@ -98,5 +98,15 @@ class TTProxy : ClientBase<ITTService>, ITTService
     {
         throw new NotImplementedException();
     }
+
+    public void AddSecondaryQuestion(string ticket_id, string title, string problem, string question)
+    {
+        Channel.AddSecondaryQuestion(ticket_id, title, problem, question);
+    }
+
+    public DataTable GetUnansweredSecondaryQuestions()
+    {
+        return Channel.GetUnansweredSecondaryQuestions();
+    }
 }
 

@@ -42,5 +42,13 @@ namespace TTService
         [WebGet(UriTemplate = "/users/{role}", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         DataTable GetPeopleByRole(string role);
+
+        [WebInvoke(Method = "POST", UriTemplate = "/unanswered_tickets", BodyStyle = WebMessageBodyStyle.WrappedRequest, RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        [OperationContract]
+        void AddSecondaryQuestion(string troubleTicketId, string title, string problem, string question);
+
+        [WebGet(UriTemplate = "/unanswered_tickets", ResponseFormat = WebMessageFormat.Json)]
+        [OperationContract]
+        DataTable GetUnansweredSecondaryQuestions();
     }
 }

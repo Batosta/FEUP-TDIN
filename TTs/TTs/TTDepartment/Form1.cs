@@ -17,6 +17,7 @@ namespace TTDepartment
 
             InitializeComponent();
 
+            GetUnansweredSecondaryQuestions();
             ListenToMessageQueue();
         }
 
@@ -48,6 +49,7 @@ namespace TTDepartment
                 String[] messageData = (String[])newMessage.Body;
 
                 dataGridView1.Rows.Add(messageData[0], messageData[1], messageData[2], messageData[3]);
+                proxy.AddSecondaryQuestion(messageData[0], messageData[1], messageData[2], messageData[3]);
 
                 msgQueue.BeginReceive();
             }
@@ -74,6 +76,16 @@ namespace TTDepartment
             {
                 MessageBox.Show("Please choose one of the questions.");
                 return;
+            }
+        }
+    
+        private void GetUnansweredSecondaryQuestions()
+        {
+            DataTable secondaryQuestions = proxy.GetUnansweredSecondaryQuestions();
+            for(int i = 0; i < secondaryQuestions.Rows.Count; i++)
+            {
+                DataRow row = secondaryQuestions.Rows[i];
+                dataGridView1.Rows.Add(row["Id"], row["Title"], row["Problem"], row["Question"]);
             }
         }
     }
@@ -124,6 +136,16 @@ namespace TTDepartment
         public DataTable GetPeopleByRole(string role)
         {
             return Channel.GetPeopleByRole(role);
+        }
+    
+        public void AddSecondaryQuestion(string ticket_id, string title, string problem, string question)
+        {
+            Channel.AddSecondaryQuestion(ticket_id, title, problem, question);
+        }
+
+        public DataTable GetUnansweredSecondaryQuestions()
+        {
+            return Channel.GetUnansweredSecondaryQuestions();
         }
     }
 }

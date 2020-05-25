@@ -138,8 +138,8 @@ namespace TTClient
             {
                 if (dataGridView2.SelectedRows.Count != 0)
                 {
-                    string questions = Interaction.InputBox("Questions for the department:", "Questions", "");
-                    if (String.IsNullOrWhiteSpace(questions))
+                    string question = Interaction.InputBox("Questions for the department:", "Questions", "");
+                    if (String.IsNullOrWhiteSpace(question))
                     {
                         MessageBox.Show("Invalid input.");
                         return;
@@ -149,7 +149,7 @@ namespace TTClient
                         string ticket_id = dataGridView2.SelectedRows[0].Cells["Id"].Value.ToString();
                         string title = dataGridView2.SelectedRows[0].Cells["Title"].Value.ToString();
                         string problem = dataGridView2.SelectedRows[0].Cells["Problem"].Value.ToString();
-                        string[] messageData = new string[4] { ticket_id, title, problem, questions };
+                        string[] messageData = new string[4] { ticket_id, title, problem, question };
 
                         messageQueue = new MessageQueue(@".\private$\myMSMQ");
                         messageQueue.Formatter = new XmlMessageFormatter(new Type[] { typeof(String[]) });
@@ -218,6 +218,16 @@ namespace TTClient
         public DataTable GetPeopleByRole(string role)
         {
             return Channel.GetPeopleByRole(role);
+        }
+
+        public void AddSecondaryQuestion(string ticket_id, string title, string problem, string question)
+        {
+            Channel.AddSecondaryQuestion(ticket_id, title, problem, question);
+        }
+
+        public DataTable GetUnansweredSecondaryQuestions()
+        {
+            return Channel.GetUnansweredSecondaryQuestions();
         }
     }
 }
