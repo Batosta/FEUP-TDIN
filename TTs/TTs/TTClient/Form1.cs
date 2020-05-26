@@ -138,24 +138,32 @@ namespace TTClient
             {
                 if (dataGridView2.SelectedRows.Count != 0)
                 {
-                    string question = Interaction.InputBox("Questions for the department:", "Questions", "");
-                    if (String.IsNullOrWhiteSpace(question))
+                    if(!dataGridView2.SelectedRows[0].Cells["Status"].Value.ToString().Equals("waiting for answers"))
                     {
-                        MessageBox.Show("Invalid input.");
-                        return;
+                        string question = Interaction.InputBox("Questions for the department:", "Questions", "");
+                        if (String.IsNullOrWhiteSpace(question))
+                        {
+                            MessageBox.Show("Invalid input.");
+                            return;
+                        }
+                        else
+                        {
+                            string ticket_id = dataGridView2.SelectedRows[0].Cells["Id"].Value.ToString();
+                            string title = dataGridView2.SelectedRows[0].Cells["Title"].Value.ToString();
+                            string problem = dataGridView2.SelectedRows[0].Cells["Problem"].Value.ToString();
+                            string[] messageData = new string[4] { ticket_id, title, problem, question };
+
+                            messageQueue = new MessageQueue(@".\private$\myMSMQ");
+                            messageQueue.Formatter = new XmlMessageFormatter(new Type[] { typeof(String[]) });
+                            messageQueue.Send(messageData);
+
+                            proxy.TicketWaitingForAnswers(ticket_id);
+                        }
                     }
                     else
                     {
-                        string ticket_id = dataGridView2.SelectedRows[0].Cells["Id"].Value.ToString();
-                        string title = dataGridView2.SelectedRows[0].Cells["Title"].Value.ToString();
-                        string problem = dataGridView2.SelectedRows[0].Cells["Problem"].Value.ToString();
-                        string[] messageData = new string[4] { ticket_id, title, problem, question };
-
-                        messageQueue = new MessageQueue(@".\private$\myMSMQ");
-                        messageQueue.Formatter = new XmlMessageFormatter(new Type[] { typeof(String[]) });
-                        messageQueue.Send(messageData);
-
-                        proxy.TicketWaitingForAnswers(ticket_id);
+                        MessageBox.Show("That ticket is already waiting for an answer.");
+                        return;
                     }
                 }
                 else
@@ -223,6 +231,11 @@ namespace TTClient
         public void AddSecondaryQuestion(string ticket_id, string title, string problem, string question)
         {
             Channel.AddSecondaryQuestion(ticket_id, title, problem, question);
+        }
+
+        public void DeleteSecondaryQuestion(string ticket_id)
+        {
+            Channel.DeleteSecondaryQuestion(ticket_id);
         }
 
         public DataTable GetUnansweredSecondaryQuestions()

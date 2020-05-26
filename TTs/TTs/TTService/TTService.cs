@@ -147,23 +147,6 @@ namespace TTService
                 try
                 {
                     c.Open();
-                    string sql = "delete from SecondaryQuestions where TTId=@i1";
-                    SqlCommand cmd = new SqlCommand(sql, c);
-                    cmd.Parameters.AddWithValue("@i1", Int32.Parse(ticket_id));
-                    cmd.ExecuteNonQuery();
-                }
-                catch (SqlException sqlEx)
-                {
-                    Console.WriteLine(sqlEx);
-                }
-                finally
-                {
-                    c.Close();
-                }
-
-                try
-                {
-                    c.Open();
                     string sql = "update TroubleTickets set DepartmentExplanation=@a1, Status='assigned' where Id=@i1";
                     SqlCommand cmd = new SqlCommand(sql, c);
                     cmd.Parameters.AddWithValue("@a1", answer);
@@ -324,7 +307,7 @@ namespace TTService
                 try
                 {
                     c.Open();
-                    string sql = "select Id, Title, Problem, Question from SecondaryQuestions";
+                    string sql = "select TTId, Title, Problem, Question from SecondaryQuestions";
                     SqlCommand cmd = new SqlCommand(sql, c);
                     SqlDataAdapter adapter = new SqlDataAdapter(cmd);
                     adapter.Fill(result);
@@ -367,7 +350,30 @@ namespace TTService
             }
         }
 
-
+        public void DeleteSecondaryQuestion(string ticket_id)
+        {
+            using (SqlConnection c = new SqlConnection(database))
+            {
+                try
+                {
+                    c.Open();
+                    string sql = "delete from SecondaryQuestions where TTId=@i1";
+                    SqlCommand cmd = new SqlCommand(sql, c);
+                    cmd.Parameters.AddWithValue("@i1", Int32.Parse(ticket_id));
+                    cmd.ExecuteNonQuery();
+                }
+                catch (SqlException sqlEx)
+                {
+                    Console.WriteLine(sqlEx);
+                }
+                finally
+                {
+                    c.Close();
+                }
+            }
+        }
+          
+        
 
         private DataTable GetTicketById(string ticket_id)
         {

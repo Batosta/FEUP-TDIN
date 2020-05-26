@@ -45,10 +45,14 @@ namespace TTService
 
         [WebInvoke(Method = "POST", UriTemplate = "/unanswered_tickets", BodyStyle = WebMessageBodyStyle.WrappedRequest, RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        void AddSecondaryQuestion(string troubleTicketId, string title, string problem, string question);
+        void AddSecondaryQuestion(string ticket_id, string title, string problem, string question);
 
         [WebGet(UriTemplate = "/unanswered_tickets", ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         DataTable GetUnansweredSecondaryQuestions();
+
+        [WebInvoke(Method = "DELETE", UriTemplate = "/secondary_question", BodyStyle = WebMessageBodyStyle.WrappedRequest, RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        [OperationContract]
+        void DeleteSecondaryQuestion(string ticket_id);
     }
 }

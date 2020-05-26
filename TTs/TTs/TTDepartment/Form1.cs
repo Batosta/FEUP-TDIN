@@ -67,8 +67,9 @@ namespace TTDepartment
                 }
                 else
                 {
-                    string ticket_id = dataGridView1.SelectedRows[0].Cells["Id"].Value.ToString();
+                    string ticket_id = dataGridView1.SelectedRows[0].Cells["TTId"].Value.ToString();
                     dataGridView1.Rows.RemoveAt(dataGridView1.SelectedRows[0].Index);
+                    proxy.DeleteSecondaryQuestion(ticket_id);
                     proxy.AnswerToQuestion(answer, ticket_id);
                 }
             }
@@ -85,7 +86,7 @@ namespace TTDepartment
             for(int i = 0; i < secondaryQuestions.Rows.Count; i++)
             {
                 DataRow row = secondaryQuestions.Rows[i];
-                dataGridView1.Rows.Add(row["Id"], row["Title"], row["Problem"], row["Question"]);
+                dataGridView1.Rows.Add(row["TTId"], row["Title"], row["Problem"], row["Question"]);
             }
         }
     }
@@ -142,6 +143,12 @@ namespace TTDepartment
         {
             Channel.AddSecondaryQuestion(ticket_id, title, problem, question);
         }
+
+        public void DeleteSecondaryQuestion(string ticket_id)
+        {
+            Channel.DeleteSecondaryQuestion(ticket_id);
+        }
+
 
         public DataTable GetUnansweredSecondaryQuestions()
         {

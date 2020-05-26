@@ -104,6 +104,11 @@ class TTProxy : ClientBase<ITTService>, ITTService
         Channel.AddSecondaryQuestion(ticket_id, title, problem, question);
     }
 
+    public void DeleteSecondaryQuestion(string ticket_id)
+    {
+        Channel.DeleteSecondaryQuestion(ticket_id);
+    }
+
     public DataTable GetUnansweredSecondaryQuestions()
     {
         return Channel.GetUnansweredSecondaryQuestions();

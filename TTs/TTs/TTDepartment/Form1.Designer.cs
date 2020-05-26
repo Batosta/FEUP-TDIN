@@ -31,7 +31,7 @@
             this.button1 = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.Id = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.TTId = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Title = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Problem = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Question = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -68,7 +68,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.Id,
+            this.TTId,
             this.Title,
             this.Problem,
             this.Question});
@@ -81,11 +81,11 @@
             this.dataGridView1.Size = new System.Drawing.Size(761, 237);
             this.dataGridView1.TabIndex = 0;
             // 
-            // Id
+            // TTId
             // 
-            this.Id.HeaderText = "Id";
-            this.Id.Name = "Id";
-            this.Id.ReadOnly = true;
+            this.TTId.HeaderText = "TTId";
+            this.TTId.Name = "TTId";
+            this.TTId.ReadOnly = true;
             // 
             // Title
             // 
@@ -125,7 +125,7 @@
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.DataGridView dataGridView1;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Id;
+        private System.Windows.Forms.DataGridViewTextBoxColumn TTId;
         private System.Windows.Forms.DataGridViewTextBoxColumn Title;
         private System.Windows.Forms.DataGridViewTextBoxColumn Problem;
         private System.Windows.Forms.DataGridViewTextBoxColumn Question;
