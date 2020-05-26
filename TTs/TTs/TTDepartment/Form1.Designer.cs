@@ -44,7 +44,7 @@
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(83, 40);
             this.button1.TabIndex = 2;
-            this.button1.Text = "Answer to Ticket";
+            this.button1.Text = "Answer to Question";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
@@ -54,9 +54,9 @@
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F);
             this.label1.Location = new System.Drawing.Point(12, 28);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(196, 25);
+            this.label1.Size = new System.Drawing.Size(222, 25);
             this.label1.TabIndex = 1;
-            this.label1.Text = "Unanswered Tickets:";
+            this.label1.Text = "Unanswered Questions:";
             // 
             // dataGridView1
             // 
